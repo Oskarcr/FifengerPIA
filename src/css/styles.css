@@ -221,7 +221,9 @@ input:focus {
     display: flex;
     font-size: medium;
     justify-content: center;
+    color: var(--secondary-color-1);
     text-decoration: underline;
+    cursor: pointer;
 }
 
 #login-button {
@@ -230,6 +232,7 @@ input:focus {
     border: none;
     border-radius: var(--border-radius);
     font-size: medium;
+    cursor: pointer;
 }
 
 /**/
@@ -264,6 +267,7 @@ input:focus {
     border: none;
     border-radius: var(--border-radius);
     font-size: medium;
+    cursor: pointer;
 }
 
 @media (orientation: portrait) {  
@@ -283,5 +287,9 @@ input:focus {
 
     #login-title {
         align-items: center;
+    }
+
+    #signup-title {
+        height: 12%;
     }
 }
