@@ -1,7 +1,7 @@
 /* Variables */
 
 body {
-    --padding-short: 14px;
+    --padding-short: 16px;
     --padding-medium: calc(var(--padding-short) * 1.5);;
     --padding-long: calc(var(--padding-short) * 2);
     --primary-color-2: rgb(33, 33, 39);

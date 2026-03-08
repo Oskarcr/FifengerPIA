@@ -1,0 +1,14 @@
+[
+    {
+        "title": "Profile",
+        "label": "Allows you to view your data. You can also modify it here"
+    },
+    {
+        "title": "Store",
+        "label": "In this option you can buy items using your points"
+    },
+    {
+        "title": "Sign out",
+        "label": "It has the function to log out and switch accounts"
+    }
+]
