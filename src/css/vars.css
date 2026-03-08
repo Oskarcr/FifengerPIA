@@ -1,0 +1,19 @@
+/* Variables */
+
+body {
+    --padding-short: 14px;
+    --padding-medium: calc(var(--padding-short) * 1.5);;
+    --padding-long: calc(var(--padding-short) * 2);
+    --primary-color-2: rgb(33, 33, 39);
+    --primary-color-1: rgb(20, 20, 24);
+    --secondary-color-1: rgb(84, 208, 65);
+    --border-color: rgb(55, 57, 71);
+    --border-radius: 20px;
+    --border-size: 2px;
+    --border: var(--border-size) var(--border-color) solid;
+    --transition-background: background-color 0.2s ease;
+    --transition-border: border-color 0.2s ease;
+    --font-size-short: 1.2rem;
+    --font-size-medium: 1.4rem;
+    --font-size-long: 1.6rem;
+}

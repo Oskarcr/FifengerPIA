@@ -1,0 +1,116 @@
+@import url("./defaults.css");
+@import url("./vars.css");
+
+/* CSS local */
+
+#header {
+    display: flex;
+    height: 90px;
+    background-color: var(--primary-color-1);
+    border-bottom: var(--border);
+    align-items: center;
+    justify-content: center;
+}
+
+#root-content {
+    display: flex;
+    flex: 1;
+    background-color: var(--primary-color-1);
+    box-sizing: border-box;
+}
+
+.chat-option {
+    display: flex;
+    flex-direction: row;
+    height: 100px;
+    width: 100%;
+    background-color: var(--primary-color-2);
+    border: var(--border);
+    position: relative;
+    box-sizing: border-box;
+    padding: var(--padding-short);
+    border-radius: var(--border-radius);
+    max-width: 800px;
+    cursor: pointer;
+    transition: var(--transition-background), var(--transition-border);
+}
+
+.chat-option:hover {
+    background-color: var(--border-color);
+    border-color: var(--secondary-color-1);
+}
+
+.chat-option-image {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+}
+
+.chat-option-image > img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.chat-option-image > .chat-option-status {
+    width: 20%;
+    background-color: rgb(0, 255, 0);
+    border: 5px var(--primary-color-2) solid;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.chat-option-username {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    padding: var(--padding-short);
+}
+
+.button-icon {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0px;
+    outline: none;
+    background-color: var(--primary-color-1);
+    transition: var(--transition-background);
+    border: 0;
+    cursor: pointer;
+}
+
+.button-icon .mso {
+    font-size: 2.5rem;
+}
+
+.button-icon:hover {
+    background-color: var(--primary-color-2);
+}
+
+#header > input {
+    margin-inline: var(--padding-short);
+    flex: 1;
+    max-width: 800px;
+}
+
+input {
+    font-size: 1.2rem;
+    padding: var(--padding-short);
+    background-color: var(--primary-color-2);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+    transition: var(--transition-background), var(--transition-border);
+}
+
+input:hover {
+    background-color: var(--border-color);
+}
+
+input:focus {
+    border-color: var(--secondary-color-1);
+}
