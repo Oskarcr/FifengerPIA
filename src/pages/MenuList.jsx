@@ -16,7 +16,9 @@ export default function MenuList() {
     for(let i = 0; i < MENU_OPTIONS.length; i++) {
         const title = MENU_OPTIONS[i].title;
         const label = MENU_OPTIONS[i].label;
-        const element = <MenuOption title={title} label={label} key={"menu_option_key_" + i}/>
+        const target = MENU_OPTIONS[i].target;
+        const onClick = (target ? () => setPage(MENU_OPTIONS[i].target) : () => {});
+        const element = <MenuOption title={title} label={label} key={"menu_option_key_" + i} onClick={() => onClick()}/>
         children.push(element);
     }
     return (<>

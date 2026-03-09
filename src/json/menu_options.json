@@ -1,7 +1,8 @@
 [
     {
         "title": "Profile",
-        "label": "Allows you to view your data. You can also modify it here"
+        "label": "Allows you to view your data. You can also modify it here",
+        "target": "profile"
     },
     {
         "title": "Store",
@@ -9,6 +10,7 @@
     },
     {
         "title": "Sign out",
-        "label": "It has the function to log out and switch accounts"
+        "label": "It has the function to log out and switch accounts",
+        "target": "login"
     }
 ]

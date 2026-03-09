@@ -7,6 +7,6 @@ import MenuList from './pages/MenuList.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {getPage("login")}
+    {getPage("profile")}
   </StrictMode>,
 )

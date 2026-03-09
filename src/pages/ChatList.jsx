@@ -14,7 +14,7 @@ export default function ChatList() {
         <div id="header">
             <ButtonIcon icon="menu" onClick={() => setPage("menu_list")}/>
             <div className="header-search-container">
-                <input type="text"/>   
+                <input type="text" placeholder="Search user by username"/>   
                 <ButtonIcon icon="search"/>
             </div>
         </div>

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\" \"start http://localhost:5173\"",
     "server": "node --env-file=.env.local server.js",
     "client": "vite",
     "build": "vite build",

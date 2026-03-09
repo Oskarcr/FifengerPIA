@@ -5,6 +5,7 @@
 
 #header {
     display: flex;
+    flex-shrink: 0;
     height: 90px;
     background-color: var(--primary-color-1);
     border-bottom: var(--border);
@@ -145,8 +146,101 @@
     font-size: 2.6rem;
 }
 
+#profile-container {
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 100%;
+    max-width: 860px;
+    min-height: 10px;
+    background-color: var(--primary-color-2);
+    border-radius: var(--border-radius);
+    border: var(--border);
+    overflow: hidden;
+    box-sizing: border-box;
+    gap: var(--padding-medium);
+}
+
+.profile-bottom {
+    padding: var(--padding-short);
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-short);
+}
+
+#profile-bottom-container {
+    height: 180px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: var(--padding-short);
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+#profile-inputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--padding-short);
+    flex: 1;
+    min-width: 100px;
+    max-width: 460px;
+}
+
+#profile-inputs > input:not(:disabled) {
+    background-color: var(--primary-color-1);
+}
+
+.profile-banner {
+    width: 100%;
+    height: 20vh;
+    max-height: 180px;
+    object-fit: cover;
+}
+
+.profile-photo {
+    height: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: var(--border);
+}
+
+#profile-acquisitions-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 180px);
+    gap: var(--padding-medium);
+    background-color: var(--primary-color-1);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    padding: var(--padding-short);
+    justify-content: center;
+}
+
+.profile-acquisition {
+    display: inline-block;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 180px;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    transition: var(--transition-border);
+    overflow: hidden;
+}
+
+.profile-acquisition > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-acquisition:hover {
+    border-color: var(--secondary-color-1);
+}
+
 input {
-    font-size: 1.2rem;
+    font-size: var(--font-size-short);
     padding: var(--padding-short);
     background-color: var(--primary-color-2);
     border: var(--border);
@@ -155,6 +249,11 @@ input {
     outline: none;
     box-sizing: border-box;
     transition: var(--transition-background), var(--transition-border);
+}
+
+input:disabled {
+    background-color: transparent;
+    border: none;
 }
 
 input:hover {
