@@ -1,0 +1,77 @@
+.store-container {
+    background-color: var(--primary-color-1);
+    color: white;
+    padding: var(--padding-long);
+    min-height: 100vh;
+    font-family: sans-serif; 
+}
+
+.store-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--padding-long);
+    border-bottom: var(--border);
+    padding-bottom: var(--padding-short);
+}
+
+.points-display {
+    background-color: var(--primary-color-2);
+    padding: var(--padding-short) var(--padding-medium);
+    border-radius: var(--border-radius);
+    border: var(--border);
+    font-size: var(--font-size-medium);
+}
+
+.points-display span {
+    color: var(--secondary-color-1);
+    font-weight: bold;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--padding-medium);
+}
+
+.item-card {
+    background-color: var(--primary-color-2);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    padding: var(--padding-medium);
+    transition: var(--transition-background), var(--transition-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-short);
+}
+
+.item-card:hover {
+    border-color: var(--secondary-color-1);
+}
+
+.item-name {
+    font-size: var(--font-size-medium);
+    margin: 0;
+}
+
+.item-price {
+    font-size: var(--font-size-short);
+    color: #ccc;
+}
+
+
+.buy-button {
+    background-color: transparent;
+    color: var(--secondary-color-1);
+    border: 2px solid var(--secondary-color-1);
+    padding: var(--padding-short);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.buy-button:hover {
+    background-color: var(--secondary-color-1);
+    color: var(--primary-color-1);
+}
