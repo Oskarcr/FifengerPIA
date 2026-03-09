@@ -2,12 +2,14 @@ import ChatList from "./pages/ChatList";
 import Login from "./pages/Login";
 import MenuList from "./pages/MenuList";
 import Profile from "./pages/Profile";
+import Signup from "./pages/Signup";
 
 const ROUTES_PAGES = {
     "chat_list": <ChatList/>,
     "menu_list": <MenuList/>,
     "login": <Login/>,
-    "profile": <Profile/>
+    "profile": <Profile/>,
+    "signup": <Signup/>
 }
 
 /**
