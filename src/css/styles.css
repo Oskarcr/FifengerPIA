@@ -233,9 +233,9 @@ input:focus {
     border-radius: var(--border-radius);
     font-size: medium;
     cursor: pointer;
+    font-weight: bolder;
 }
 
-/**/
 #signup-title {
     display: flex;
     font-weight: bolder;
@@ -267,6 +267,7 @@ input:focus {
     border: none;
     border-radius: var(--border-radius);
     font-size: medium;
+    font-weight: bolder;
     cursor: pointer;
 }
 
