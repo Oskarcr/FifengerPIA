@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import "./Chat.css";
+import "../css/Chat.css";
 
 const Chat = () => {
   const [message, setMessage] = useState("");
@@ -70,5 +70,6 @@ const Chat = () => {
     </div>
   );
 };
+
 
 export default Chat;
