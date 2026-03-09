@@ -5,6 +5,6 @@ import getPage from './Routes.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {getPage("chat")}
+    {getPage("login")}
   </StrictMode>,
 );

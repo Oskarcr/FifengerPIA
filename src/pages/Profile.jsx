@@ -25,10 +25,10 @@ export default function Profile() {
             padding: "var(--padding-medium)",
         }}>
             <div id="profile-container">
-                <img className="profile-banner" src="https://stadibox.sfo2.digitaloceanspaces.com/Diablos_Rojos_Estadio_Harp_Helu_2_8a630673b7.png"/>
+                <img className="profile-banner" src="./Copa2026.png"/>
                 <div className="profile-bottom">
                     <div id="profile-bottom-container">
-                        <img className="profile-photo" src="https://images.genius.com/04cabcd7cba7ee26de65fbcf5c67acd4.300x300x1.jpg"/>
+                        <img className="profile-photo" src="./LTG.jpg"/>
                         <div id="profile-inputs">
                             <input style={{
                                 fontSize: "var(--font-size-long)"
@@ -48,9 +48,9 @@ export default function Profile() {
                         <Icon name="crown"/>
                     </div>
                     <div id="profile-acquisitions-container">
-                        <ProfileAcquisition src="https://assets1.afa.com.ar/media/LUCAS-GAIO/Junio-2025/webfifa26.jpg"/>
-                        <ProfileAcquisition src="https://images.genius.com/04cabcd7cba7ee26de65fbcf5c67acd4.300x300x1.jpg"/>
-                        <ProfileAcquisition src="https://stadibox.sfo2.digitaloceanspaces.com/Diablos_Rojos_Estadio_Harp_Helu_2_8a630673b7.png"/>
+                        <ProfileAcquisition src="./Mundial2026-2.jpg"/>
+                        <ProfileAcquisition src="./LTG.jpg"/>
+                        <ProfileAcquisition src="./Copa2026.png"/>
                     </div>
                 </div>
             </div>    

@@ -1,4 +1,4 @@
-export default function StoreItem({name="", price="", src="https://aleteo.com.mx/wp-content/uploads/2025/04/show-de-medio-tiempo-para-el-mundial-2026.jpg"}) {
+export default function StoreItem({name="", price="", src="./Mundial2026.jpg"}) {
     return (<div className="item-card">
         <img src={src}/>
         <h3 className="item-name">{name}</h3>
