@@ -90,18 +90,29 @@
     aspect-ratio: 1 / 1;
     border-radius: 0px;
     outline: none;
-    background-color: var(--primary-color-1);
     transition: var(--transition-background);
     border: 0;
     cursor: pointer;
+}
+
+.button-icon[color="dark"] {
+    background-color: var(--primary-color-1);
+}
+
+.button-icon[color="darkgray"] {
+    background-color: var(--primary-color-2);
 }
 
 .button-icon .mso {
     font-size: 2.5rem;
 }
 
-.button-icon:hover {
+.button-icon:hover[color="dark"] {
     background-color: var(--primary-color-2);
+}
+
+.button-icon:hover[color="darkgray"] {
+    background-color: var(--border-color);
 }
 
 .header-title {

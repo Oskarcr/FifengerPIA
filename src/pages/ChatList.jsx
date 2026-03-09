@@ -2,7 +2,6 @@ import { useState } from "react";
 import ButtonIcon from "../components/ButtonIcon";
 import ChatOption from "../components/ChatOption";
 import getPage from "../Routes";
-import Flexed from "../components/Flexed";
 
 export default function ChatList() {
     const PAGE_NAME = "chat_list";
@@ -24,9 +23,9 @@ export default function ChatList() {
             padding: "var(--padding-short)",
             alignItems: "center"
         }}>
-            <ChatOption/>
-            <ChatOption/>
-            <ChatOption/>
+            <ChatOption onClick={() => setPage("chat")}/>
+            <ChatOption onClick={() => setPage("chat")}/>
+            <ChatOption onClick={() => setPage("chat")}/>
         </div>
     </>);
 }
