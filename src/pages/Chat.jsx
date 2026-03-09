@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import "../css/Chat.css";
 
-const Chat = () => {
+export default function Chat() {
   const [message, setMessage] = useState("");
-
   return (
     <div className="chat-layout">
       {/* Barra Lateral: Grupos del Mundial */}
@@ -70,6 +69,3 @@ const Chat = () => {
     </div>
   );
 };
-
-
-export default Chat;
