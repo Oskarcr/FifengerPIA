@@ -12,7 +12,7 @@ export default function Login() {
         <div id="container-wrapper">
             <div id="card-container">
                 <div id="card">
-                    <div id="login-title">Login In</div>
+                    <div id="login-title">Login in to Fifenger</div>
                     <input id="login-email" type="email" placeholder="Email"></input>
                     <input id="login-password" type="password" placeholder="Password"></input>
                     <a id="login-account" onClick={() => setPage("signup")}>Don't you have account?</a>
