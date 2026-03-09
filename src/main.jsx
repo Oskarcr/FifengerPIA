@@ -8,6 +8,6 @@ import Signup from './pages/Signup.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Login/>
+    {getPage("login")}
   </StrictMode>,
 )

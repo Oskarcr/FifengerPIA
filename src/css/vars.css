@@ -14,6 +14,6 @@ body {
     --transition-background: background-color 0.2s ease;
     --transition-border: border-color 0.2s ease;
     --font-size-short: 1.2rem;
-    --font-size-medium: 1.4rem;
-    --font-size-long: 1.6rem;
+    --font-size-medium: 1.5rem;
+    --font-size-long: 1.8rem;
 }
