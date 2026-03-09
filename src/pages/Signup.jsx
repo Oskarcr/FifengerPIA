@@ -12,7 +12,7 @@ export default function Signup() {
         <div id="container-wrapper">
             <div id="card-container">
                 <div id="card">
-                    <div id="signup-title">Signup</div>
+                    <div id="signup-title">Signup in to Fifenger</div>
                     <input id="signup-username" type="text" placeholder="Username"></input>
                     <input id="signup-email" type="email" placeholder="Email"></input>
                     <input id="signup-password" type="password" placeholder="Password"></input>
