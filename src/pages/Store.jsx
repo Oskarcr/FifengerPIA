@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import "../css/Chat.css";
+import "../css/Store.css";
 
 const Store = () => {
 
@@ -50,3 +50,4 @@ const Store = () => {
 
 
 export default Store;
+
