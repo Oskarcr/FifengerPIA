@@ -6,7 +6,8 @@
     },
     {
         "title": "Store",
-        "label": "In this option you can buy items using your points"
+        "label": "In this option you can buy items using your points",
+        "target": "store"
     },
     {
         "title": "Sign out",

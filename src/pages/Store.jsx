@@ -1,53 +1,54 @@
 import React, { useState } from 'react';
 import "../css/Store.css";
+import Flexed from '../components/Flexed';
+import ButtonIcon from '../components/ButtonIcon';
+import getPage from '../Routes';
+import StoreItem from '../components/StoreItem';
 
-const Store = () => {
-
-  const [userPoints, setUserPoints] = useState(1500);
-
-
-  const storeItems = [
-    { id: 1, name: "Banner del Mundial", price: 300 },
-    { id: 2, name: "Avatar de Mascota de México", price: 500 },
-    { id: 3, name: "Marco de Neón", price: 250 },
-    { id: 4, name: "Fondo Animado", price: 800 },
-  ];
-
-
-  const handleBuy = (item) => {
-    if (userPoints >= item.price) {
-      setUserPoints(userPoints - item.price);
-      alert(`¡Felicidades! Has adquirido: ${item.name}`);
-    } else {
-      alert("No tienes suficientes puntos para este artículo ");
+export default function Store() {
+    const PAGE_NAME = "store";
+    
+    const [userPoints, setUserPoints] = useState(1500);
+    const [pageName, setPage] = useState(PAGE_NAME);
+    if (pageName != PAGE_NAME) {
+        return getPage(pageName);
     }
-  };
 
-  return (
-    <div className="store-container">
-      <header className="store-header">
-        <h1>Tienda de Puntos</h1>
-        <div className="points-display">
-          Mis Puntos: <span>{userPoints}</span>
+    const storeItems = [
+        { name: "Item", price: 300 },
+        { name: "Item", price: 500 },
+        { name: "Item", price: 250 },
+        { name: "Item", price: 800 },
+    ];
+
+    const children = storeItems.map((item) => (
+        <StoreItem name={item.name} price={item.price}/>
+    ));
+
+    return (<>
+        <div id="header">
+            <ButtonIcon icon="arrow_left_alt" onClick={() => setPage("menu_list")} />
+            <Flexed className="header-title">
+                Store 
+            </Flexed>
+            <div className="points-display">
+                Available: <span>{userPoints + " points"}</span>
+            </div>
         </div>
-      </header>
-
-      <div className="items-grid">
-        {storeItems.map((item) => (
-          <div key={item.id} className="item-card">
-            <div className="item-icon">💎</div> {/* ICONO */}
-            <h3 className="item-name">{item.name}</h3>
-            <span className="item-price">{item.price} pts</span>
-            <button className="buy-button" onClick={() => handleBuy(item)}>
-              Adquirir
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        <div id="root-content" style={{
+            display: "flex",
+            alignItems: "center",
+        }}>
+            <div style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "var(--padding-medium)",
+                padding: "var(--padding-short)",
+                marginLeft: "auto",
+                marginRight: "auto"
+            }}>
+                {children}
+            </div>
+        </div>
+    </>);
 };
-
-
-export default Store;
-
