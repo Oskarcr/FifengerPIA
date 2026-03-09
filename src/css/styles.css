@@ -228,7 +228,7 @@ input:focus {
 
 #login-button {
     height: 50px;
-    background-color: rgb(61, 158, 61);
+    background-color: var(--secondary-color-1);
     border: none;
     border-radius: var(--border-radius);
     font-size: medium;
@@ -263,7 +263,7 @@ input:focus {
 
 #signup-button {
     height: 50px;
-    background-color: rgb(61, 158, 61);
+    background-color: var(--secondary-color-1);
     border: none;
     border-radius: var(--border-radius);
     font-size: medium;
