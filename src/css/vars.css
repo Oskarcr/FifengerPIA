@@ -13,6 +13,7 @@ body {
     --border: var(--border-size) var(--border-color) solid;
     --transition-background: background-color 0.2s ease;
     --transition-border: border-color 0.2s ease;
+    --font-size-tiny: 1rem;
     --font-size-short: 1.2rem;
     --font-size-medium: 1.5rem;
     --font-size-long: 1.8rem;
