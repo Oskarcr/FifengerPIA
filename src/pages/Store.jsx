@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
+import { Components } from "@/Fifenger";
 import "../css/Store.css";
-import Flexed from '../components/Flexed';
-import ButtonIcon from '../components/ButtonIcon';
-import getPage from '../Routes';
-import StoreItem from '../components/StoreItem';
+import { useNavigate } from "react-router-dom";
 
 export default function Store() {
-    const PAGE_NAME = "store";
-    
-    const [userPoints, setUserPoints] = useState(1500);
-    const [pageName, setPage] = useState(PAGE_NAME);
-    if (pageName != PAGE_NAME) {
-        return getPage(pageName);
-    }
+    const navigate = useNavigate();
+
+    const userPoints = 90;
 
     const storeItems = [
         { name: "Item", price: 300 },
@@ -22,15 +15,15 @@ export default function Store() {
     ];
 
     const children = storeItems.map((item) => (
-        <StoreItem name={item.name} price={item.price}/>
+        <Components.StoreItem name={item.name} price={item.price}/>
     ));
 
     return (<>
         <div id="header">
-            <ButtonIcon icon="arrow_left_alt" onClick={() => setPage("menu_list")} />
-            <Flexed className="header-title">
+            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/menu")} />
+            <Components.Flexed className="header-title">
                 Store 
-            </Flexed>
+            </Components.Flexed>
             <div className="points-display">
                 Available: <span>{userPoints + " points"}</span>
             </div>

@@ -1,20 +1,14 @@
-import { useState } from "react";
-import ButtonIcon from "../components/ButtonIcon";
-import ChatOption from "../components/ChatOption";
-import getPage from "../Routes";
+import { Components } from "@/Fifenger";
+import { useNavigate } from "react-router-dom";
 
 export default function ChatList() {
-    const PAGE_NAME = "chat_list";
-    const [pageName, setPage] = useState(PAGE_NAME);
-    if(pageName != PAGE_NAME) {
-        return getPage(pageName);
-    }
+    const navigate = useNavigate();
     return (<>
         <div id="header">
-            <ButtonIcon icon="menu" onClick={() => setPage("menu_list")}/>
+            <Components.ButtonIcon icon="menu" onClick={() => navigate("/menu")}/>
             <div className="header-search-container">
                 <input type="text" placeholder="Search user by username"/>   
-                <ButtonIcon icon="search"/>
+                <Components.ButtonIcon icon="search"/>
             </div>
         </div>
         <div id="root-content" style={{
@@ -23,9 +17,9 @@ export default function ChatList() {
             padding: "var(--padding-short)",
             alignItems: "center"
         }}>
-            <ChatOption onClick={() => setPage("chat")}/>
-            <ChatOption onClick={() => setPage("chat")}/>
-            <ChatOption onClick={() => setPage("chat")}/>
+            <Components.ChatOption onClick={() => navigate("/chat")}/>
+            <Components.ChatOption onClick={() => navigate("/chat")}/>
+            <Components.ChatOption onClick={() => navigate("/chat")}/>
         </div>
     </>);
 }

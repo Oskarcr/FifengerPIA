@@ -1,5 +1,4 @@
 class Response {
-
     /**
      * 
      * @param {string} email 
@@ -28,9 +27,7 @@ class Response {
      */
     static CheckCredentials(email, password) {
         if(!email) return alert("No existe tu correo");
-
         if(!password) return alert("No existe tu contraseña");
-
         return true;
     }
 }

@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "paths": {
+            "@/Fifenger": ["./src/Fifenger.jsx"]
+        }
+    }
+}
