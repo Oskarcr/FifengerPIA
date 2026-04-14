@@ -1,23 +1,15 @@
-import { useState } from "react";
-import getPage from "../Routes";
-import ButtonIcon from "../components/ButtonIcon";
-import Flexed from "../components/Flexed";
-import ProfileAcquisition from "../components/ProfileAcquisition";
-import Icon from "../components/Icon";
+import { Components } from "@/Fifenger";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
-    const PAGE_NAME = "profile";
-    const [pageName, setPage] = useState(PAGE_NAME);
-    if(pageName != PAGE_NAME) {
-        return getPage(pageName);
-    }
+    const navigate = useNavigate();
 
     return (<>
         <div id="header">
-            <ButtonIcon icon="arrow_left_alt" onClick={() => setPage("menu_list")}/>
-            <Flexed className="header-title">
+            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/menu")}/>
+            <Components.Flexed className="header-title">
                 Perfil
-            </Flexed>
+            </Components.Flexed>
         </div>
         <div id="root-content" style={{
             alignItems: "center",
@@ -45,12 +37,12 @@ export default function Profile() {
                         justifyContent: "center"
                     }}>
                         Acquisitions &nbsp;&nbsp;&nbsp;&nbsp;
-                        <Icon name="crown"/>
+                        <Components.Icon name="crown"/>
                     </div>
                     <div id="profile-acquisitions-container">
-                        <ProfileAcquisition src="./Mundial2026-2.jpg"/>
-                        <ProfileAcquisition src="./LTG.jpg"/>
-                        <ProfileAcquisition src="./Copa2026.png"/>
+                        <Components.ProfileAcquisition src="./Mundial2026-2.jpg"/>
+                        <Components.ProfileAcquisition src="./LTG.jpg"/>
+                        <Components.ProfileAcquisition src="./Copa2026.png"/>
                     </div>
                 </div>
             </div>    

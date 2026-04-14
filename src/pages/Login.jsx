@@ -1,12 +1,7 @@
-import { useState } from "react";
-import getPage from "../Routes";
+import { useNavigate } from "react-router-dom"
 
 export default function Login() {
-    const PAGE_NAME = "login";
-    const [pageName, setPage] = useState(PAGE_NAME);
-    if (pageName != PAGE_NAME) {
-        return getPage(pageName);
-    }
+    const navigate = useNavigate();
 
     return (
         <div id="container-wrapper">
@@ -15,8 +10,8 @@ export default function Login() {
                     <div id="login-title">Login in to Fifenger</div>
                     <input id="login-email" type="email" placeholder="Email"></input>
                     <input id="login-password" type="password" placeholder="Password"></input>
-                    <a id="login-account" onClick={() => setPage("signup")}>Don't you have account?</a>
-                    <button id="login-button" type="submit" onClick={() => setPage("chat_list")}>Login</button>
+                    <span id="login-account" onClick={() => navigate("/signup")}>Don't you have account?</span>
+                    <button id="login-button" type="submit" onClick={() => navigate("/chat_list")}>Login</button>
                 </div>
             </div>
         </div>

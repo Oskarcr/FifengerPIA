@@ -6,9 +6,14 @@
 }
 
 #root {
-    display: flex;
     width: 100vw;
     height: 100vh;
+}
+
+#root > div {
+    height: 100%;
+    width: 100%;
+    display: flex;
     position: relative;
     flex-direction: column;
     font-family: "Roboto";
