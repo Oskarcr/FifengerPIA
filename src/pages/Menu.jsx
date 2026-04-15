@@ -23,8 +23,8 @@ export default function Menu() {
         </div>
         <div id="root-content" style={{
             flexDirection: "column",
-            gap: "var(--padding-short)",
-            padding: "var(--padding-short)",
+            gap: "var(--spacing-short)",
+            padding: "var(--spacing-short)",
             alignItems: "center"
         }}>
             {children}

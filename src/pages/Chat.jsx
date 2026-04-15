@@ -11,7 +11,7 @@ export default function Chat() {
             <Components.Flexed className="header-title">
                 Low
                 <span style={{
-                    marginLeft: "var(--padding-medium)",
+                    marginLeft: "var(--spacing-medium)",
                     fontSize: "var(--font-size-short)"
                 }}>
                     12 miembros

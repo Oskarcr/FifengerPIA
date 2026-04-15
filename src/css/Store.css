@@ -1,7 +1,7 @@
 .store-container {
     background-color: var(--primary-color-1);
     color: white;
-    padding: var(--padding-long);
+    padding: var(--spacing-long);
     min-height: 100vh;
     font-family: sans-serif; 
 }
@@ -10,18 +10,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--padding-long);
+    margin-bottom: var(--spacing-long);
     border-bottom: var(--border);
-    padding-bottom: var(--padding-short);
+    padding-bottom: var(--spacing-short);
 }
 
 .points-display {
     background-color: var(--primary-color-2);
-    padding: var(--padding-short) var(--padding-medium);
+    padding: var(--spacing-short) var(--spacing-medium);
     border-radius: var(--border-radius);
     border: var(--border);
     font-size: var(--font-size-short);
-    margin-right: var(--padding-short);
+    margin-right: var(--spacing-short);
 }
 
 .points-display > span {
@@ -31,7 +31,7 @@
 .items-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--padding-medium);
+    gap: var(--spacing-medium);
 }
 
 .item-card {
@@ -39,11 +39,11 @@
     background-color: var(--primary-color-2);
     border: var(--border);
     border-radius: var(--border-radius);
-    padding: var(--padding-medium);
+    padding: var(--spacing-medium);
     transition: var(--transition-background), var(--transition-border);
     display: flex;
     flex-direction: column;
-    gap: var(--padding-short);
+    gap: var(--spacing-short);
     cursor: pointer;
 }
 
@@ -74,10 +74,10 @@
     background-color: transparent;
     color: var(--secondary-color-1);
     border: 2px solid var(--secondary-color-1);
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .buy-button:hover {

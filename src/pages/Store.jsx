@@ -35,8 +35,8 @@ export default function Store() {
             <div style={{
                 display: "flex",
                 flexDirection: "row",
-                gap: "var(--padding-medium)",
-                padding: "var(--padding-short)",
+                gap: "var(--spacing-medium)",
+                padding: "var(--spacing-short)",
                 marginLeft: "auto",
                 marginRight: "auto"
             }}>
