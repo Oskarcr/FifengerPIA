@@ -1,12 +1,57 @@
 @import url("./defaults.css");
-@import url("./vars.css");
+@import url("./mobile.css") screen and (max-width: 750px);
+@import url("./desktop.css") screen and (min-width: 751px);
+
+@media (orientation: landscape) {
+    *[data-orientation="portrait"] {
+        display: none !important;
+    }
+}
+
+@media (orientation: portrait) {
+    *[data-orientation="landscape"] {
+        display: none !important;
+    }
+}
+
+body {
+    /*--spacing-short: 16px;
+    --spacing-medium: calc(var(--spacing-short) * 1.5);;
+    --spacing-long: calc(var(--spacing-short) * 2);
+    --primary-color-2: rgb(33, 33, 39);
+    --primary-color-1: rgb(20, 20, 24);
+    --secondary-color-1: rgb(84, 208, 65);
+    --border-color: rgb(55, 57, 71);
+    --border-radius: 20px;
+    --border-size: 2px;
+    --border: var(--border-size) var(--border-color) solid;
+    --transition-background: background-color 0.2s ease;
+    --transition-border: border-color 0.2s ease;
+    --font-size-tiny: 1rem;
+    --font-size-short: 1.2rem;
+    --font-size-medium: 1.5rem;
+    --font-size-long: 1.8rem;*/
+
+    
+    --primary-color-1: rgb(20, 20, 24);
+    --primary-color-2: rgb(33, 33, 39);
+    --secondary-color-1: rgb(84, 208, 65);
+    --border-color: rgb(55, 57, 71);
+
+    --border-radius: 20px;
+    --border-size: 2px;
+    --border: var(--border-size) var(--border-color) solid;
+    --transition-background: background-color 0.2s ease;
+    --transition-border: border-color 0.2s ease;
+    --spacing-medium: calc(var(--spacing-short) * 1.5);
+    --spacing-long: calc(var(--spacing-short) * 2);
+}
 
 /* CSS local */
 
 #header {
     display: flex;
     flex-shrink: 0;
-    height: 90px;
     background-color: var(--primary-color-1);
     border-bottom: var(--border);
     align-items: center;
@@ -28,7 +73,7 @@
 }
 
 .header-search-container > input {
-    margin-inline: var(--padding-short);
+    margin-inline: var(--spacing-short);
     flex: 1;
     max-width: 800px;
 }
@@ -36,13 +81,12 @@
 .chat-option {
     display: flex;
     flex-direction: row;
-    height: 100px;
     width: 100%;
     background-color: var(--primary-color-2);
     border: var(--border);
     position: relative;
     box-sizing: border-box;
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     border-radius: var(--border-radius);
     max-width: 800px;
     cursor: pointer;
@@ -67,7 +111,7 @@
     border-radius: 50%;
 }
 
-.chat-option-image>.chat-option-status {
+.chat-option-image > .chat-option-status {
     width: 20%;
     background-color: rgb(0, 255, 0);
     border: 5px var(--primary-color-2) solid;
@@ -79,10 +123,10 @@
 }
 
 .chat-option-username {
-    font-size: 1.4rem;
+    font-size: var(--font-size-medium);
     display: flex;
     align-items: center;
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
 }
 
 .button-icon {
@@ -103,10 +147,6 @@
     background-color: var(--primary-color-2);
 }
 
-.button-icon .mso {
-    font-size: 2.5rem;
-}
-
 .button-icon:hover[color="dark"] {
     background-color: var(--primary-color-2);
 }
@@ -117,20 +157,19 @@
 
 .header-title {
     font-size: var(--font-size-medium);
-    margin-left: var(--padding-short);
+    margin-left: var(--spacing-short);
 }
 
 .menu-option {
     display: flex;
     flex-direction: row;
-    min-height: 100px;
     align-items: center;
     width: 100%;
     border-radius: var(--border-radius);
     border: var(--border);
     background-color: var(--primary-color-2);
     transition: var(--transition-background), var(--transition-border);
-    padding: var(--padding-medium);
+    padding: var(--spacing-medium);
     box-sizing: border-box;
     cursor: pointer;
     max-width: 1000px;
@@ -143,18 +182,13 @@
 }
 
 .menu-option-title {
-    width: 160px;
     font-size:  var(--font-size-medium);
 }
 
 .menu-option-label {
     flex: 1;
     font-size: var(--font-size-short);
-    margin-left: var(--padding-short);
-}
-
-.menu-option .mso {
-    font-size: 2.6rem;
+    margin-left: var(--spacing-short);
 }
 
 #profile-container {
@@ -168,22 +202,21 @@
     border: var(--border);
     overflow: hidden;
     box-sizing: border-box;
-    gap: var(--padding-medium);
+    gap: var(--spacing-medium);
 }
 
 .profile-bottom {
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     display: flex;
     flex-direction: column;
-    gap: var(--padding-short);
+    gap: var(--spacing-short);
 }
 
 #profile-bottom-container {
-    height: 180px;
     width: 100%;
     display: flex;
     flex-direction: row;
-    gap: var(--padding-short);
+    gap: var(--spacing-short);
     justify-content: center;
     box-sizing: border-box;
 }
@@ -192,7 +225,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: var(--padding-short);
+    gap: var(--spacing-short);
     flex: 1;
     min-width: 100px;
     max-width: 460px;
@@ -218,12 +251,11 @@
 
 #profile-acquisitions-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 180px);
-    gap: var(--padding-medium);
+    gap: var(--spacing-medium);
     background-color: var(--primary-color-1);
     border-radius: var(--border-radius);
     overflow: hidden;
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     justify-content: center;
 }
 
@@ -231,7 +263,6 @@
     display: inline-block;
     flex-shrink: 0;
     box-sizing: border-box;
-    width: 180px;
     aspect-ratio: 1 / 1;
     position: relative;
     border: var(--border);
@@ -252,7 +283,7 @@
 
 input {
     font-size: var(--font-size-short);
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     background-color: var(--primary-color-2);
     border: var(--border);
     border-radius: var(--border-radius);
@@ -301,7 +332,7 @@ input:focus {
     max-width: 700px;
     height: 100%;
     justify-content: center;
-    padding: var(--padding-short);
+    padding: var(--spacing-short);
     background-color: var(--primary-color-2);
     box-sizing: border-box;
     gap: 20px;

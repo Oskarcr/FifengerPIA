@@ -1,0 +1,50 @@
+body {
+    --spacing-short: 14px;
+    --font-size-short: 1.1rem;
+    --font-size-medium: 1.4rem;
+    --font-size-long: 1.8rem;
+    --font-size-xl1: 2.3rem;
+    --font-size-xl2: 2.8rem;
+    --font-size-xl3: 3.4rem;
+}
+
+#header, .chat-input-area {
+    height: 90px;
+}
+
+.button-icon .mso {
+    font-size: 2.2rem;
+}
+
+.chat-option {  
+    height: 100px;
+}
+
+.menu-option {
+    min-height: 100px;
+}
+
+.menu-option-title {
+    width: 160px;
+}
+
+.menu-option .mso {
+    font-size: 2.6rem;
+}
+
+.message > img {
+    width: 80px;
+    height: 80px;
+}
+
+.chat-input-area {
+    height: 90px;
+}
+
+#profile-acquisitions-container {
+    grid-template-columns: repeat(auto-fit, 180px);
+}
+
+#profile-bottom-container, .profile-acquisition {
+    height: 180px;
+}

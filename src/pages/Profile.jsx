@@ -14,7 +14,7 @@ export default function Profile() {
         <div id="root-content" style={{
             alignItems: "center",
             flexDirection: "column",
-            padding: "var(--padding-medium)",
+            padding: "var(--spacing-medium)",
         }}>
             <div id="profile-container">
                 <img className="profile-banner" src="./Copa2026.png"/>
@@ -32,7 +32,7 @@ export default function Profile() {
                         display: "flex",
                         flexDirection: "row",
                         fontSize: "var(--font-size-medium)",
-                        paddingTop: "var(--padding-short)",
+                        paddingTop: "var(--spacing-short)",
                         borderTop: "var(--border)",
                         justifyContent: "center"
                     }}>
