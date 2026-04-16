@@ -1,8 +1,16 @@
-import { Components } from "@/Fifenger";
+import { api, Components } from "@/Fifenger";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function ChatList() {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        api.get("/test")
+        .then(res => alert(res.data))
+        .catch(err => console.error(err));
+    }, []);
+
     return (<>
         <div id="header">
             <Components.ButtonIcon icon="menu" onClick={() => navigate("/menu")}/>
