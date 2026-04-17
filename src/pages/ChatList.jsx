@@ -1,19 +1,18 @@
 import { api, Components } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function ChatList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-    const user = sessionStorage.getItem("email");
-    if (!user) {
-        alert("Debes iniciar sesión.");
-        navigate("/login");
-    } else {
-        console.log("Bienvenido:", sessionStorage.getItem("username"));
-    }
-}, []);
+        const user = sessionStorage.getItem("email");
+        if (!user) {
+            alert("Debes iniciar sesión.");
+            navigate("/login");
+        } else {
+            console.log("Bienvenido:", sessionStorage.getItem("username"));
+        }
+    }, []);
 
     return (<>
         <div id="header">
