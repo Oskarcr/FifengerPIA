@@ -4,19 +4,15 @@ import { useNavigate } from "react-router-dom";
 export default function ChatList() {
     const navigate = useNavigate();
 
-    /*
     useEffect(() => {
-        api.get("/auth")
-            .then(res => {
-                console.log("Welcome back.", res.data);
-            })
-            .catch(err => {
-                console.error("You are not logged in.");
-                alert("You must be log in nigga.");
-                navigate("/login");
-            });
+        const user = sessionStorage.getItem("email");
+        if (!user) {
+            alert("Debes iniciar sesión.");
+            navigate("/login");
+        } else {
+            console.log("Bienvenido:", sessionStorage.getItem("username"));
+        }
     }, []);
-    */
 
     return (<>
         <div id="header">
