@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const ChatSchema = new Schema({
+const ConversationSchema = new Schema({
     isGroup: Boolean,
     name: String,
     participants: [{
@@ -9,4 +9,4 @@ const ChatSchema = new Schema({
     }]
 });
 
-export default model("Chat", ChatSchema);
+export default model("Conversation", ConversationSchema);

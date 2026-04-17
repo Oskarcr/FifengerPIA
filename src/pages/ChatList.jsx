@@ -1,10 +1,10 @@
 import { api, Components } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function ChatList() {
     const navigate = useNavigate();
 
+    /*
     useEffect(() => {
         api.get("/auth")
             .then(res => {
@@ -16,6 +16,7 @@ export default function ChatList() {
                 navigate("/login");
             });
     }, []);
+    */
 
     return (<>
         <div id="header">
