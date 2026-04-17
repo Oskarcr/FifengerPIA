@@ -45,6 +45,7 @@ class Server {
             res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
             next();
         });
+        app.use(express.json());
         app.use("/static", express.static("public"));
         app.use("/api", api);
         app.get("/", (req, res) => res.send("Hello world!"));

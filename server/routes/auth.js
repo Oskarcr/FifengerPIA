@@ -1,29 +1,30 @@
+import { Models } from "#FifengerServer";
 import { Router } from "express";
-import User from "../models/user.js"
 import bcrypt from "bcrypt";
 const auth = Router();
 
 auth.post("/signup", async (req, res) => {
     try {
-        console.log("HOLA");
         const email = req.body.email;
         const username = req.body.username;
         const password = req.body.password;
 
+        console.log(req.body);
+
         if (!username || !email || !password) {
-            return res.status(400).json({ msg: "At least one of the fields is empty." });
+            return res.status(400).send("At least one of the fields is empty.");
         }
 
-        const exists = await User.findOne({ email });
+        const exists = await Models.User.findOne({ email });
 
         if (exists) {
-            return res.status(400).json({ msg: "This user already exists." });
+            return res.status(400).send("This user already exists.");
         }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = new User({
+        const user = new Models.User({
             username,
             email,
             password: hashedPassword
@@ -31,13 +32,12 @@ auth.post("/signup", async (req, res) => {
 
         await user.save();
 
-        res.status(201).json({ msg: "User added successfully."});
+        res.status(201).send("User added successfully.");
     }
     catch (error){
         console.error(error);
-        return res.status(500).json({ msg: "Server error."});
+        return res.status(500).send(error);
     }
-   res.send("hola");
 });
 
 auth.post("/login", async (req, res) => {
@@ -45,24 +45,21 @@ auth.post("/login", async (req, res) => {
         const email = req.body.email;
         const password = req.body.password;
 
-        const user = await User.findOne({ email });
+        const user = await Models.User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ msg: "Invalid credentials." });
+            return res.status(400).send("Invalid credentials.");
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ msg: "Incorrect password." });
+            return res.status(400).send("Incorrect password.");
         }
 
-        return res.status(201).json({
-            msg: "Login successful",
-            user: { username: user.username, email: user.email }
-        });
+        return res.status(201).json({username: user.username, email: user.email });
     }
     catch (error){
         console.error(error);
-        return res.status(500).json({ msg: "Server error."});
+        return res.status(500).send("Server error.");
     }
 });
 
