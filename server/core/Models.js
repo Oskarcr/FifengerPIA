@@ -1,13 +1,13 @@
-import chat from "../models/chat.js";
-import message from "../models/message.js";
-import objetive from "../models/objetive.js";
-import user from "../models/user.js";
+import Chat from "../models/chat.js";
+import Message from "../models/message.js";
+import Objetive from "../models/objetive.js";
+import User from "../models/user.js";
 
 const Models = {
-    chat,
-    message,
-    objetive,
-    user
+    Chat,
+    Message,
+    Objetive,
+    User
 };
 
 export default Models;
