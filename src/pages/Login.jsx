@@ -1,44 +1,34 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useRef } from "react";
+import { api } from "@/Fifenger";
 
 export default function Login() {
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const formRef = useRef(null);
 
-    const login = async () => {
+    const login = async (evt) => {
         try {
-            const response = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json"},
-                body: JSON.stringify({email,password})
-            })
-
-            const data = await response.json();
-
-            if(response.ok) {
-                data.msg;
-                navigate("/chat_list")
-            }
-            else data.msg;
+            evt.preventDefault();
+            const response = await api.postForm("/api/login", formRef.current);
+            alert(response.statusText);
         }
-        catch (error){
-            alert("Server connection error.")
+        catch (error) {
             console.error(error);
+            alert("Server connection error.");
         }
     }
 
     return (
         <div id="container-wrapper">
             <div id="card-container">
-                <div id="card">
+                <form id="card">
                     <div id="login-title">Login in to Fifenger</div>
-                    <input id="login-email" type="email" placeholder="Email" onChange={(evt) => setEmail(evt.target.value)}></input>
-                    <input id="login-password" type="password" placeholder="Password" onChange={(evt) =>setPassword(evt.target.value)}></input>
+                    <input id="login-email" type="email" placeholder="Email"></input>
+                    <input id="login-password" type="password" placeholder="Password"></input>
                     <span id="login-account" onClick={() => navigate("/signup")}>Don't you have account?</span>
                     <button id="login-button" type="submit" onClick={login}>Login</button>
-                </div>
+                </form>
             </div>
         </div>
     )
