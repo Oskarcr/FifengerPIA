@@ -1,4 +1,4 @@
-import { Components } from "@/Fifenger";
+import { Components } from "@/FifengerClient";
 import "../css/Chat.css";
 import { useNavigate } from "react-router-dom";
 

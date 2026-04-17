@@ -1,6 +1,6 @@
 import { Router } from "express";
 import User from "../models/user.js"
-import bcrypt from "bcrypt" 
+import bcrypt from "bcrypt";
 const auth = Router();
 
 auth.post("/signup", async (req, res) => {

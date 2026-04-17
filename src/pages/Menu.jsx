@@ -1,4 +1,4 @@
-import { Components } from "@/Fifenger";
+import { Components } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
 import MENU_OPTIONS from "../json/menu_options.json";
 
