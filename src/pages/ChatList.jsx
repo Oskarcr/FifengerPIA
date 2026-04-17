@@ -1,4 +1,4 @@
-import { api, Components } from "@/Fifenger";
+import { api, Components } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useEffect, useRef } from "react";
-import { api } from "@/Fifenger";
+import { api } from "@/FifengerClient";
 
 export default function Signup() {
     const navigate = useNavigate();

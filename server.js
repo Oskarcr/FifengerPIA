@@ -1,5 +1,5 @@
+import { api } from "#FifengerServer";
 import express from "express";
-import api from "./api.js";
 import mongoose from "mongoose";
 
 const app = express();
