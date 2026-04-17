@@ -12,7 +12,7 @@ export default function Signup() {
             const response = await api.postForm("/auth/signup", formRef.current);
             alert(response.statusText);
         }
-        catch (error){
+        catch (error) {
             console.log(error);
             alert("Server.error");
         }
@@ -25,9 +25,8 @@ export default function Signup() {
                 <input id="signup-username" type="text" placeholder="Username"></input>
                 <input id="signup-email" type="email" placeholder="Email"></input>
                 <input id="signup-password" type="password" placeholder="Password"></input>
-                
-                    <span id="login-account" onClick={() => navigate("/login")}>Do you already have an account?</span>
-                <button id="signup-button" onClick={signup}>Signup</button>
+                <span id="login-account" onClick={() => navigate("/login")}>Do you already have an account?</span>
+                <button id="signup-button" type="submit" onClick={signup}>Signup</button>
             </form>
         </div>
     </div>);
