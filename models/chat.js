@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+import { Schema, model } from "mongoose";
 
 const ChatSchema = new Schema({
     isGroup: Boolean,
@@ -8,6 +7,6 @@ const ChatSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }]
-})
+});
 
-module.exports = mongoose.model("Chat", ChatSchema);
+export default model("Chat", ChatSchema);
