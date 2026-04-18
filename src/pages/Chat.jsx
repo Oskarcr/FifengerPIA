@@ -1,36 +1,144 @@
-import { Components } from "@/FifengerClient";
+import { Components, api, socket } from "@/FifengerClient";
 import "../css/Chat.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 
 export default function Chat() {
+    const delay = 0.15 * 1000;
+    /**@type {import("react").RefObject<HTMLInputElement>} */
+    const messageInputRef = useRef(null);
+    const { destinatorId, conversationId } = useParams();
+    const [label, setLabel] = useState("Loading...");
+    const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
 
-    return (
-        <>
-            <div id="header">
-                <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chat_list")} />
-                <Components.Flexed className="header-title">
-                    Low
-                    <span style={{ marginLeft: "var(--spacing-medium)", fontSize: "var(--font-size-short)" }}>
-                        12 miembros
-                    </span>
-                </Components.Flexed>
+    const isTemp = !!destinatorId;
 
-                {/* AQUÍ ESTÁ EL CAMBIO: Agregamos el onClick para navegar */}
-                <Components.ButtonIcon icon="call" onClick={() => navigate("/video_call")} />
+    useEffect(() => {
+        if (!conversationId) return;
+        socket.emit("join_conversation", {
+            conversationId: conversationId
+        });
+    }, [conversationId]);
 
-                <Components.ButtonIcon icon="location_on" />
-                <Components.ButtonIcon icon="group_add" />
-            </div>
+    useEffect(() => {
+        let cancelable = true;
+
+        const username = sessionStorage.getItem("username");
+        
+        const timer = setTimeout(() => {
+            cancelable = false;
+            if(isTemp) {
+                api.get("users/" + destinatorId).then((response) => {
+                    const user = response.data;
+                    setLabel(user.username);
+                }); 
+            }
+            else {
+                api.get("conversations/" + conversationId).then((response) => {
+                    const item = response.data;
+                    const name = item.isGroup ? item.name : item.participants.find(a => a.username != username)?.username;
+                    setLabel(name);
+                });
+            }
+            
+        }, delay);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [isTemp, destinatorId, conversationId, delay]);
+
+    useEffect(() => {
+        const handler = (message) => {
+            setMessages((prev) => [{
+                ...message,
+                user: {
+                    username: message.username
+                }
+            }, ...prev]);
+        };
+
+        socket.on("message_create", handler);
+
+        return () => {
+            socket.off("message_create", handler);
+        };
+    }, []);
+
+    useEffect(() => {
+        if(isTemp) return;
+        if (!conversationId) return;
+
+        let cancelable = true;
+
+        const timer = setTimeout(async () => {
+            cancelable = false;
+
+            api.get("messages/" + conversationId)
+            .then(res => setMessages(res.data));
+            
+        }, delay);
+         
+        return () => {
+            if(cancelable) clearTimeout(timer);
+        };
+    }, [conversationId]);
+
+    const sendMessage = async () => {
+        const senderId = sessionStorage.getItem("id");
+        const content = messageInputRef.current.value;
+        messageInputRef.current.value = "";
+        try {
+            const response = await api.post("messages", {
+                senderId: senderId,
+                content: content,
+                destinatorId: destinatorId,
+                conversationId: conversationId
+            });
+            if(isTemp) navigate("/chat/" + response.data.conversationId);
+        }
+        catch(error) {
+            alert(error.response.data);
+        }
+    }
+
+    const children = [];
+
+    for(let i = 0; i < messages.length; i++) {
+        children.push(<Components.Message 
+            timestamp={messages[i].createdAt}
+            sender={messages[i].user.username}
+            content={messages[i].content}
+        />);
+    }
+
+    return (<>
+        <div id="header">
+            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chats")} />
+            <Components.Flexed className="header-title">
+                {label}
+                <span style={{
+                    marginLeft: "var(--spacing-medium)",
+                    fontSize: "var(--font-size-short)"
+                }}>
+                    {/* 12 miembros */}
+                </span>
+            </Components.Flexed>
+            <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
+            <Components.ButtonIcon icon="location_on" />
+            <Components.ButtonIcon icon="group_add" />
+        </div>
         <div id="root-content" style={{
             flex: 1,
+            position: "relative",
+            overflow: "hidden",
+            width: "100%",
             display: "flex",
             flexDirection: "column"
         }}>
             <section className="messages-area">
-                <Components.Message sender="Low" content="What's up, man? XD im LOW-TIER-GOD"/>
-                <Components.Message sender="You" content="No hablo ingles amigo"/>
-                <Components.Message sender="Low" content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis cumque blanditiis alias doloribus illo nobis itaque facilis nemo? Officiis rerum nemo beatae vel. Odio possimus nostrum doloremque eum? Quasi, dolores."/>
+                {children}
             </section>
 
             <footer className="chat-input-area">
@@ -41,11 +149,12 @@ export default function Chat() {
                     alignItems: "center"
                 }}>
                     <input
+                        ref={messageInputRef}
                         type="text"
                         placeholder="Escribe un mensaje futbolero..."
                     />
                 </div>
-                <Components.ButtonIcon icon="send" darkgray/>
+                <Components.ButtonIcon onClick={() => sendMessage()} icon="send" darkgray/>
             </footer>
         </div>
     </>);

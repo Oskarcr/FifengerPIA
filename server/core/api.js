@@ -9,6 +9,12 @@ api.get("/", (req, res) => {
 
 api.use("/hola", ServerRoutes.hola);
 
+api.use("/conversations", ServerRoutes.conversations);
+
+api.use("/messages", ServerRoutes.messages);
+
+api.use("/users", ServerRoutes.users);
+
 api.use("/test", ServerRoutes.test);
 
 api.use("/auth", ServerRoutes.auth);

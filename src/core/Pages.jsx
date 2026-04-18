@@ -9,6 +9,7 @@ import Profile from "../pages/Profile";
 import Signup from "../pages/Signup";
 import Store from "../pages/Store";
 import Test from "../pages/Test.jsx";
+import VideoCall from "../pages/VideoCall.jsx";
 
 /**
  * Es un objeto que tiene todas los componentes
@@ -23,7 +24,8 @@ const Pages = {
     Signup,
     Store,
     Test,
-    NotFound
+    NotFound,
+    VideoCall
 };
 
 Object.freeze(Pages);

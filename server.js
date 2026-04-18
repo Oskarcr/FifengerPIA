@@ -1,55 +1,41 @@
-import { api } from "#FifengerServer";
-import express from "express";
+import { app, setEventsToSocket } from "#FifengerServer";
 import mongoose from "mongoose";
+import http from "http";
+import { Server as SocketServer } from "socket.io";
 
-const app = express();
 const port = process.env["SERVER_PORT"];
 const url = process.env["DATABASE_URL"];
 
-/**
- * Inicia el servidor!
- */
-class Server {
-    static #started = false;
+const server = http.createServer(app);
 
-    /**
-     * Intenta iniciar el servizor.
-     */
-    static async start() {
-        if(Server.#started) return;
-        Server.#started = true;
-        try {
-            await mongoose.connect(url);
-            console.log("Database connected sucessfully");
-        }
-        catch(err) {
-            console.log("Could not connect to the database");
-            console.error(err);
-            return;
-        }
-        Server.#configurate();
-        app.listen(port, () => {
-            console.log("App listeting on http://localhost:" + port);
-        });
+const io = new SocketServer(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        credentials: true
+    }
+});
 
+app.set("io", io);
+
+async function start() {
+    try {
+        await mongoose.connect(url);
+        console.log("Database connected sucessfully");
+    }
+    catch(err) {
+        console.log("Could not connect to the database");
+        console.error(err); 
+        process.exit(0);
     }
 
-    /**
-     * Configura el servidor.
-     */
-    static #configurate() {
-        app.use((req, res, next) => {
-            res.header("Access-Control-Allow-Credentials", true);
-            res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-            res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-            res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            next();
-        });
-        app.use(express.json());
-        app.use("/static", express.static("public"));
-        app.use("/api", api);
-        app.get("/", (req, res) => res.send("Hello world!"));
-    }
+    io.on("connection", (socket) => {
+        console.log("connection!");
+        setEventsToSocket(socket, io);
+    });
+
+    server.listen(port, () => {
+        console.log("App listeting on http://localhost:" + port);
+    });
 }
 
-Server.start();
+start();

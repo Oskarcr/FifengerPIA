@@ -3,15 +3,12 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom'; 
 import "./index.css";
 import "./css/styles.css";
-import { GlobalStyle } from "@/FifengerClient"; 
-import App from "./App"; 
+import { AppRoutes, GlobalStyle } from "@/FifengerClient"; 
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <Router> 
-            <div style={GlobalStyle}>
-                <App /> 
-            </div>
-        </Router>
+        <div style={GlobalStyle}>
+            <AppRoutes/> 
+        </div>
     </StrictMode>,
 )

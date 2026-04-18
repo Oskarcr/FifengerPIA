@@ -7,3 +7,4 @@ export { default as FontSize } from "./core/FontSize.js";
 export { default as Spacing } from "./core/Spacing.js";
 export { default as AppRoutes } from "./core/AppRoutes.jsx";
 export { default as api } from "./core/api.js";
+export { socket } from "./core/socket.js";
