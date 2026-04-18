@@ -13,6 +13,7 @@ export default function AppRoutes() {
             <Route path="/signup" element= {<Pages.Signup/>}/>
             <Route path="/store" element= {<Pages.Store/>}/>
             {/* Cualquier pagina que no sea las de arriba */}
+            <Route path="/test" element= {<Pages.Test/>}/>
             <Route path="*" element= {<Pages.NotFound/>}/>
         </Routes>
     </BrowserRouter>);

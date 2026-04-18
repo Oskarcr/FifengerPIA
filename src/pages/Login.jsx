@@ -4,7 +4,6 @@ import { api } from "@/FifengerClient";
 
 export default function Login() {
     const navigate = useNavigate();
-
     const formRef = useRef(null);
 
     const login = async (evt) => {
@@ -14,12 +13,12 @@ export default function Login() {
 
         try {
             const response = await api.post("/auth/login", data);
+            sessionStorage.setItem("token", response.data.token);
             sessionStorage.setItem("username", response.data.username);
-            sessionStorage.setItem("email", response.data.email);
             navigate("/chat_list");
         }
         catch (error) {
-            alert(error.response.data);
+            alert(error.response.data); 
         }
     }
 
