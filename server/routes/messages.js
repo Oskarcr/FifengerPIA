@@ -1,5 +1,6 @@
 import { Models } from "#FifengerServer";
 import { Router } from "express";
+import { Server } from "socket.io";
 const messages = Router();
 
 messages.get("/:conversationId",async (req, res) => {
@@ -11,6 +12,10 @@ messages.get("/:conversationId",async (req, res) => {
 });
 
 messages.post("/", async (req, res) => {
+    /**@type {Server} */
+    const io = req.app.get("io");
+    if(!io) return res.status(500).send("Server error, try again later...");
+
     const { senderId, content, conversationId, destinatorId } = req.body;
 
     if(typeof content !== "string") return res.status(400).send("Content must be 'string'");
@@ -65,7 +70,14 @@ messages.post("/", async (req, res) => {
     objMessage.user = sender.toObject();
     delete objMessage.user.password;
 
-    //res.status(200).send(objMessage);
+    io.to(conversation._id.toString()).emit("message_create", {
+        username: sender.get("username"),
+        content: content,
+        conversationId: conversationId,
+        createdAt: Date.now()
+    });
+
+    res.status(200).send(objMessage);
 });
 
 export default messages;

@@ -36,6 +36,7 @@ body {
     --primary-color-1: rgb(20, 20, 24);
     --primary-color-2: rgb(33, 33, 39);
     --secondary-color-1: rgb(84, 208, 65);
+    --secondary-color-2: rgb(255, 255, 255);
     --border-color: rgb(55, 57, 71);
 
     --border-radius: 20px;
@@ -45,6 +46,7 @@ body {
     --transition-border: border-color 0.2s ease;
     --spacing-medium: calc(var(--spacing-short) * 1.5);
     --spacing-long: calc(var(--spacing-short) * 2);
+    --spacing-short: 14px;
 }
 
 /* CSS local */
@@ -435,4 +437,58 @@ input:focus {
     #signup-title {
         height: 12%;
     }
+}
+
+.message-box {
+    display: flex;
+    position: absolute;
+    z-index: 100;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    flex-direction: column;
+    padding: var(--spacing-medium);
+    box-sizing: border-box;
+    overflow: hidden;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color-2);
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border-radius: var(--border-radius);
+    gap: var(--spacing-short);
+    background-color: var(--primary-color-2);
+}
+
+.message-text-title {
+    display: flex;
+    color: var(--secondary-color-1);
+    justify-content: center;
+}
+
+.message-text-content {
+    display: flex;
+    flex: 1;
+    min-height: 200px;
+    border-radius: var(--border-radius);
+    justify-content: center;
+    color: var(--secondary-color-2);
+    background-color: var(--primary-color-2);
+}
+
+.message-button-container {
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: center;
+    background-color: var(--primary-color-2);
+}
+
+.message-button {
+    border-radius: var(--border-radius);
+    background-color: var(--secondary-color-1);
+    cursor: pointer;
 }

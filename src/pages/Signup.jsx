@@ -1,18 +1,21 @@
 import { useNavigate } from "react-router-dom"
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { api } from "@/FifengerClient";
+import MessageBox from "../components/MessageBox.jsx";
 
 export default function Signup() {
     const navigate = useNavigate();
     const formRef = useRef(null);
+    const [showMessage, setShowMessage] = useState(false);
 
     const signup = async (evt) => {
         evt.preventDefault();
         const formData = new FormData(formRef.current);
         const data = Object.fromEntries(formData.entries());
-
+        
         try {
             await api.post("/auth/signup", data);
+            setShowMessage(true);
         }
         catch (error) {
             alert(error.response.data);
@@ -30,5 +33,12 @@ export default function Signup() {
                 <button id="signup-button" type="submit" onClick={signup}>Signup</button>
             </form>
         </div>
-    </div>);
+
+        {showMessage && (
+        <MessageBox title="Success" content="User added successfully" onConfirm={() => {
+            setShowMessage(false);
+            navigate("/login")}}/>
+        )}
+    </div>
+    );
 }

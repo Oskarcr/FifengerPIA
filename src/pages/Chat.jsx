@@ -1,4 +1,4 @@
-import { Components, api } from "@/FifengerClient";
+import { Components, api, socket } from "@/FifengerClient";
 import "../css/Chat.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
@@ -15,9 +15,19 @@ export default function Chat() {
     const isTemp = !!destinatorId;
 
     useEffect(() => {
+        if (!conversationId) return;
+        socket.emit("join_conversation", {
+            conversationId: conversationId
+        });
+    }, [conversationId]);
+
+    useEffect(() => {
+        let cancelable = true;
+
         const username = sessionStorage.getItem("username");
         
         const timer = setTimeout(() => {
+            cancelable = false;
             if(isTemp) {
                 api.get("users/" + destinatorId).then((response) => {
                     const user = response.data;
@@ -31,6 +41,7 @@ export default function Chat() {
                     setLabel(name);
                 });
             }
+            
         }, delay);
 
         return () => {
@@ -39,22 +50,45 @@ export default function Chat() {
     }, [isTemp, destinatorId, conversationId, delay]);
 
     useEffect(() => {
+        const handler = (message) => {
+            setMessages((prev) => [{
+                ...message,
+                user: {
+                    username: message.username
+                }
+            }, ...prev]);
+        };
+
+        socket.on("message_create", handler);
+
+        return () => {
+            socket.off("message_create", handler);
+        };
+    }, []);
+
+    useEffect(() => {
         if(isTemp) return;
-        const timer = setTimeout(() => {
-            api.get("messages/" + conversationId).then((response) => {
-                setMessages(response.data);
-            });
+        if (!conversationId) return;
+
+        let cancelable = true;
+
+        const timer = setTimeout(async () => {
+            cancelable = false;
+
+            api.get("messages/" + conversationId)
+            .then(res => setMessages(res.data));
+            
         }, delay);
          
         return () => {
-            clearTimeout(timer);
+            if(cancelable) clearTimeout(timer);
         };
     }, [conversationId]);
 
     const sendMessage = async () => {
         const senderId = sessionStorage.getItem("id");
         const content = messageInputRef.current.value;
-        //await api.get("users/");
+        messageInputRef.current.value = "";
         try {
             const response = await api.post("messages", {
                 senderId: senderId,
@@ -68,27 +102,6 @@ export default function Chat() {
             alert(error.response.data);
         }
     }
-
-    /*
-    useEffect(() => {
-        const id = sessionStorage.getItem("email");
-        api.get("users/" + ).then((response) => {
-            const user = response.data;
-            setUser({
-                username: user.username,
-                profilePhoto: "/LGT.png"
-            });
-        });
-        
-    }, [user]);*/
-
-    /*useEffect(() => {
-        //await api.get("users/")
-        api.get("/messages/" + conversationId)
-        .then((response) => {
-            setMessages(response.data);
-        });
-    }, [conversationId]);*/
 
     const children = [];
 
@@ -112,7 +125,7 @@ export default function Chat() {
                     {/* 12 miembros */}
                 </span>
             </Components.Flexed>
-            <Components.ButtonIcon icon="call" />
+            <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
             <Components.ButtonIcon icon="location_on" />
             <Components.ButtonIcon icon="group_add" />
         </div>

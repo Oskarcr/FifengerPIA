@@ -44,3 +44,16 @@ body {
 #profile-bottom-container, .profile-acquisition {
     height: 130px;
 }
+
+.message-box{
+    min-height: 300px;
+    font-size: var(--font-size-long);
+}
+
+.message-text-title {
+    font-size: var(--font-size-long);
+}
+
+.message-button-container{
+    height: 60px;
+}
