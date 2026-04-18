@@ -1,28 +1,37 @@
-import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import mernImage from "./assets/mern.png";
+import { Routes, Route } from 'react-router-dom';
+
+// Importamos todas las páginas de tu carpeta /pages
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Chat from './pages/Chat';
+import ChatList from './pages/ChatList';
+import VideoCall from './pages/VideoCall';
+import Profile from './pages/Profile';
+import Store from './pages/Store';
+import Menu from './pages/Menu';
+import NotFound from './pages/NotFound';
 
 function App() {
-  const [count, setCount] = useState(0)
+  return (
+    <Routes>
+      {/* Rutas Principales */}
+      <Route path="/" element={<Chat />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      
+      {/* Chat y Videollamada */}
+      <Route path="/chat_list" element={<ChatList />} />
+      <Route path="/video_call" element={<VideoCall />} />
+      
+      {/* Otras secciones */}
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/store" element={<Store />} />
+      <Route path="/menu" element={<Menu />} />
 
-//////////////////////////////////////
-//        RESPUESTA DEL BACK        //
-//////////////////////////////////////
-
-  useEffect(() => {
-    fetch("http://localhost:4000/base/test")
-    .then(async res => console.log(await res.text()))
-    .catch(err => console.log(err));
-  }, []);
-
-  return <>
-      <img style={{
-        width: "100vw",
-        height: "100vh"
-      }} src={mernImage}/>
-    </>
+      {/* Esta ruta atrapa cualquier error de escritura y muestra tu NotFound */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

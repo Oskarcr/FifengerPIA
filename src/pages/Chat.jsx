@@ -5,22 +5,23 @@ import { useNavigate } from "react-router-dom";
 export default function Chat() {
     const navigate = useNavigate();
 
-    return (<>
-        <div id="header">
-            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chat_list")} />
-            <Components.Flexed className="header-title">
-                Low
-                <span style={{
-                    marginLeft: "var(--spacing-medium)",
-                    fontSize: "var(--font-size-short)"
-                }}>
-                    12 miembros
-                </span>
-            </Components.Flexed>
-            <Components.ButtonIcon icon="call" />
-            <Components.ButtonIcon icon="location_on" />
-            <Components.ButtonIcon icon="group_add" />
-        </div>
+    return (
+        <>
+            <div id="header">
+                <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chat_list")} />
+                <Components.Flexed className="header-title">
+                    Low
+                    <span style={{ marginLeft: "var(--spacing-medium)", fontSize: "var(--font-size-short)" }}>
+                        12 miembros
+                    </span>
+                </Components.Flexed>
+
+                {/* AQUÍ ESTÁ EL CAMBIO: Agregamos el onClick para navegar */}
+                <Components.ButtonIcon icon="call" onClick={() => navigate("/video_call")} />
+
+                <Components.ButtonIcon icon="location_on" />
+                <Components.ButtonIcon icon="group_add" />
+            </div>
         <div id="root-content" style={{
             flex: 1,
             display: "flex",
