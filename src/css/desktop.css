@@ -48,3 +48,18 @@ body {
 #profile-bottom-container, .profile-acquisition {
     height: 180px;
 }
+
+.message-box {
+    width: 100%;
+    max-width: 900px;
+    min-height: 300px;
+    font-size: var(--font-size-long);
+}
+
+.message-text-title {
+    font-size: var(--font-size-xl1);
+}
+
+.message-button-container {
+    height: 100px;
+}
