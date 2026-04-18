@@ -40,14 +40,15 @@
     align-items: center;
 }
 
-
 .messages-area {
+    position: relative;
     width: 100%;
     flex: 1;
+    min-height: 0;
     padding: var(--spacing-long);
-    overflow-y: auto;
+    overflow: auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: var(--spacing-short);
     align-items: center;
     box-sizing: border-box;

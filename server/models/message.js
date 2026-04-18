@@ -1,11 +1,23 @@
 import { Schema, model } from "mongoose";
 
 const MessageSchema = new Schema({
-    username: String,
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
     content: String,
-    time: Number,
-    path: String,
-    isEncripted: Boolean
+    isEncrypted: Boolean,
+    conversationId: {
+        type: Schema.Types.ObjectId,
+        ref: "Conversation"
+    }
+}, {
+    timestamps: true
+});
+
+MessageSchema.index({
+    conversationId: 1, 
+    createdAt: -1
 });
 
 export default model("Message", MessageSchema);

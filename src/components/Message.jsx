@@ -1,6 +1,17 @@
-export default function Message({sender="", content="", time="08/03/2025 a las 22:09"}) {
+export default function Message({sender="", content="", timestamp = Date.now()}) {
+    
+    const date = new Date(timestamp);
+    const time = date.toLocaleString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    }).replace(",", " at");
+
     return(<div className="message received">
-        <img src="./LTG.jpg"/>
+        <img src="/LTG.jpg"/>
         <div style={{
             flex: 1,
             display: "flex",

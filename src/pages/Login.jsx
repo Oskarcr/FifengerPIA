@@ -1,11 +1,13 @@
-import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { api } from "@/FifengerClient";
 
 export default function Login() {
     const navigate = useNavigate();
-
     const formRef = useRef(null);
+
+    const logged = sessionStorage.getItem("id");
+    if(logged) return <Navigate to={"/chats"}/>;
 
     const login = async (evt) => {
         evt.preventDefault();
@@ -16,7 +18,8 @@ export default function Login() {
             const response = await api.post("/auth/login", data);
             sessionStorage.setItem("username", response.data.username);
             sessionStorage.setItem("email", response.data.email);
-            navigate("/chat_list");
+            sessionStorage.setItem("id", response.data._id);
+            navigate("/chats");
         }
         catch (error) {
             alert(error.response.data);

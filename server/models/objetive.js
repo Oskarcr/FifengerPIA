@@ -3,9 +3,9 @@ import { Schema, model } from "mongoose";
 const ObjetiveSchema = new Schema({
     title: String,
     tasks: [String],
-    chat: {
+    conversation: {
         type: Schema.Types.ObjectId,
-        ref: "Chat"
+        ref: "Conversation"
     }
 });
 

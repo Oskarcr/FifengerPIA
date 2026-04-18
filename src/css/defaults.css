@@ -5,6 +5,14 @@
     src: url("./MaterialSymbolsOutlined[FILL\,GRAD\,opsz\,wght].ttf") format('truetype');
 }
 
+* {
+    scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
+
 #root {
     width: 100vw;
     height: 100vh;

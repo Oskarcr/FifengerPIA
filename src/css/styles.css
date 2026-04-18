@@ -79,6 +79,7 @@ body {
 }
 
 .chat-option {
+    color: white;
     display: flex;
     flex-direction: row;
     width: 100%;

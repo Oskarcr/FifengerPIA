@@ -9,8 +9,6 @@ auth.post("/signup", async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
 
-        console.log(req.body);
-
         if (!username || !email || !password) {
             return res.status(400).send("At least one of the fields is empty.");
         }
@@ -55,7 +53,7 @@ auth.post("/login", async (req, res) => {
             return res.status(400).send("Incorrect password.");
         }
 
-        return res.status(201).json({username: user.username, email: user.email });
+        return res.status(201).send({username: user.username, email: user.email, _id: user._id });
     }
     catch (error){
         console.error(error);

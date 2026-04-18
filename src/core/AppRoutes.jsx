@@ -5,8 +5,9 @@ export default function AppRoutes() {
     return (<BrowserRouter>
         <Routes>
             <Route path="/" element= {<Pages.Login/>}/>
-            <Route path="/chat" element= {<Pages.Chat/>}/>
-            <Route path="/chat_list" element= {<Pages.ChatList/>}/>
+            <Route path="/chats/temp/:destinatorId" element={<Pages.Chat/>}/>
+            <Route path="/chats" element= {<Pages.ChatList/>}/>
+            <Route path="/chats/:conversationId" element={<Pages.Chat/>}/>
             <Route path="/login" element= {<Pages.Login/>}/>
             <Route path="/menu" element= {<Pages.Menu/>}/>
             <Route path="/profile" element= {<Pages.Profile/>}/>
