@@ -1,54 +1,32 @@
 import { Models } from "#FifengerServer";
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import Validators from "../validations/main.js";
 const auth = Router();
-
-/**
- * Valida y normaliza el email
- * @param {string} email
- * @returns {string|null}
- */
-function normalizeEmail(email) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normalizedEmail)) {
-        return null;
-    }
-    return normalizedEmail;
-}
-
-/**
- * Valida y normaliza la password
- * @param {string} password
- * @returns {string|null}
- */
-function normalizePassword(password){
-    const normalizedPassword = password.trim();
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    if(!passwordRegex.test(normalizedPassword)){
-        return null;
-    }
-    return normalizedPassword;
-}
+const validator = Validators.user;
 
 auth.post("/signup", async (req, res) => {
     try {
-        /**@type {string} */
-        const email = req.body.email;
-        /**@type {string} */
-        const username = req.body.username;
-        /**@type {string} */
-        const password = req.body.password;
+        const body = validator.parseBody(req.body);
 
-        if (!username || !email || !password) {
-            return res.status(400).send("At least one of the fields is empty.");
+        const empties = validator.empties(body, "username", "email", "password");
+
+        if (empties.length > 0) {
+            res.status(400).json({
+                empties
+            });
+            return;
         }
 
-        const normalizedEmail = normalizeEmail(email)
-        if(!normalizedEmail){
-            return res.status(401).send("Invalid email");
+        const errors = validator.validate(body);
+
+        if (errors.length > 0) {
+            res.status(400).json({
+                errors
+            });
+            return;
         }
+
         const exists = await Models.User.findOne({ email: normalizedEmail });
         if (exists) {
             return res.status(409).send("This user already exists.");
@@ -58,9 +36,6 @@ auth.post("/signup", async (req, res) => {
         if(!normalizedPassword){
             return res.status(401).send("The password must contain at least 8 characters, one upper and one lower case");
         }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(normalizedPassword, salt);
 
         const user = new Models.User({
             username,
