@@ -9,4 +9,6 @@ const ConversationSchema = new Schema({
     }]
 });
 
-export default model("Conversation", ConversationSchema);
+const Conversation = model("Conversation", ConversationSchema);
+
+export default Conversation;

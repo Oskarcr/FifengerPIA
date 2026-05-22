@@ -8,4 +8,6 @@ const UserSchema = new Schema({
     inventory: [Number]
 });
 
-export default model("User", UserSchema);
+const User = model("User", UserSchema);
+
+export default User;
