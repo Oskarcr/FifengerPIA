@@ -16,10 +16,9 @@ export default function Login() {
 
         try {
             const response = await api.post("/auth/login", data);
-            sessionStorage.setItem("token", response.data.token);
             sessionStorage.setItem("username", response.data.username);
             sessionStorage.setItem("email", response.data.email);
-            sessionStorage.setItem("id", response.data._id);
+            sessionStorage.setItem("id", response.data.id);
             navigate("/chats");
         }
         catch (error) {
