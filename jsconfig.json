@@ -4,6 +4,12 @@
             "@/FifengerClient": ["./src/FifengerClient.jsx"],
             "#FifengerServer": ["./server/FifengerServer.js"],
             "#FifengerModels": ["./server/models/main.js"]
-        }
+        },
+        "jsx": "react-jsx",
+        "target": "ES2022",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "checkJs": true,
+        "strict": false
     }
 }

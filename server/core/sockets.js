@@ -7,7 +7,7 @@ import { Socket } from "socket.io";
 /**
  * Establece los eventos de socket a un socket.
  * @param {Socket} socket 
- * @param {Server} io
+ * @param {import("socket.io").Server} io
  */
 export function setEventsToSocket(socket, io) {
     socket.on("join_conversation", (data) => {
