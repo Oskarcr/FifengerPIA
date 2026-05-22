@@ -1,7 +1,7 @@
-import { Models } from "#FifengerServer";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { User } from "#FifengerModels";
 const auth = Router();
 
 /**
@@ -49,7 +49,7 @@ auth.post("/signup", async (req, res) => {
         if(!normalizedEmail){
             return res.status(401).send("Invalid email");
         }
-        const exists = await Models.User.findOne({ email: normalizedEmail });
+        const exists = await User.findOne({ email: normalizedEmail });
         if (exists) {
             return res.status(409).send("This user already exists.");
         }
@@ -62,7 +62,7 @@ auth.post("/signup", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(normalizedPassword, salt);
 
-        const user = new Models.User({
+        const user = new User({
             username,
             email: normalizedEmail,
             password: hashedPassword
@@ -92,7 +92,7 @@ auth.post("/login", async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
         const normalizedPassword = password.trim();
 
-        const user = await Models.User.findOne({ email: normalizedEmail });
+        const user = await User.findOne({ email: normalizedEmail });
         if (!user) {
             return res.status(400).send("Invalid credentials.");
         }

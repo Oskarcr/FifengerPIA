@@ -20,4 +20,6 @@ MessageSchema.index({
     createdAt: -1
 });
 
-export default model("Message", MessageSchema);
+const Message = model("Message", MessageSchema);
+
+export default Message;
