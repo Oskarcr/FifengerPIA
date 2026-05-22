@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "imports": {
-    "#FifengerServer": "./server/FifengerServer.js"
+    "#FifengerServer": "./server/FifengerServer.js",
+    "#FifengerModels": "./server/models/main.js"
   },
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\" \"start http://localhost:5173\"",

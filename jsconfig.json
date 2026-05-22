@@ -2,7 +2,8 @@
     "compilerOptions": {
         "paths": {
             "@/FifengerClient": ["./src/FifengerClient.jsx"],
-            "#FifengerServer": ["./server/FifengerServer.js"]
+            "#FifengerServer": ["./server/FifengerServer.js"],
+            "#FifengerModels": ["./server/models/main.js"]
         }
     }
 }

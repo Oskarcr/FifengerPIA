@@ -1,7 +1,7 @@
-import { Models } from "#FifengerServer";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import Validators from "../validations/main.js";
+import { User } from "#FifengerModels";
 const auth = Router();
 const validator = Validators.user;
 
@@ -26,8 +26,7 @@ auth.post("/signup", async (req, res) => {
             });
             return;
         }
-
-        const exists = await Models.User.findOne({ email: normalizedEmail });
+        const exists = await User.findOne({ email: normalizedEmail });
         if (exists) {
             return res.status(409).send("This user already exists.");
         }
@@ -37,7 +36,9 @@ auth.post("/signup", async (req, res) => {
             return res.status(401).send("The password must contain at least 8 characters, one upper and one lower case");
         }
 
-        const user = new Models.User({
+        const hashedPassword = await bcrypt.hash(normalizedPassword, 10);
+
+        const user = new User({
             username,
             email: normalizedEmail,
             password: hashedPassword
@@ -67,7 +68,7 @@ auth.post("/login", async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
         const normalizedPassword = password.trim();
 
-        const user = await Models.User.findOne({ email: normalizedEmail });
+        const user = await User.findOne({ email: normalizedEmail });
         if (!user) {
             return res.status(400).send("Invalid credentials.");
         }
