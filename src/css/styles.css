@@ -55,6 +55,15 @@ button {
     color: var(--secondary-color-2);
 }
 
+a {
+    text-decoration: underline;
+    color: rgb(112, 23, 255);
+}
+
+a:visited {
+    color: rgb(116, 90, 169)
+}
+
 #header {
     display: flex;
     flex-shrink: 0;

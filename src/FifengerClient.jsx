@@ -1,5 +1,6 @@
 // Exportacion empaquetada de toda la aplicacion.
 
+export { default as getLocationURL } from "./core/getLocationURL.js";
 export { default as GlobalStyle } from "./core/GlobalStyle.js";
 export { default as Components} from "./core/Components.jsx";
 export { default as Pages } from "./core/Pages.jsx";
