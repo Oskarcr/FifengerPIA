@@ -2,6 +2,10 @@ import { Conversation } from "#FifengerModels";
 import { Router } from "express";
 const conversations = Router();
 
+conversations.post("/group", () => {
+    
+});
+
 conversations.get("/", async (req, res) => {
     const query = req.query;
     if(!query) return res.status(400).send("User not found");

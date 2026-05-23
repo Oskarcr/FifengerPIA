@@ -199,7 +199,7 @@ class RequestValidator {
      * @param {any} unparsedBody 
      */
     parseBody(unparsedBody) {
-        /** @type {RequestValidationParsedSchema<T>} */
+        /** @type {Partial<RequestValidationParsedSchema<T>>} */
         const result = /**@type {any} */ ({});
         for(const k in this.#schema) {
             /**@type {Function} */
@@ -216,7 +216,7 @@ class RequestValidator {
     /**
      * Devuelve una lista de errores (si los contiene)
      * de cada cada regla establecida en `schema`.
-     * @param {Partial<T>} body 
+     * @param {Partial<RequestValidationParsedSchema<T>>} body 
      */
     validate(body) {
         if(!body) {
@@ -244,7 +244,7 @@ class RequestValidator {
     /**
      * Retorna una lista de errores si cada `arg` 
      * que sea atributo `body` esta vacio.
-     * @param {Partial<T>} body 
+     * @param {Partial<RequestValidationParsedSchema<T>>} body 
      * @param  {...(keyof T)} args 
      * 
      * @example
