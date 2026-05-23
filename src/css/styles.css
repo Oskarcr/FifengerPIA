@@ -55,12 +55,12 @@ button {
     color: var(--secondary-color-2);
 }
 
-a {
+a:not(.chat-option) {
     text-decoration: underline;
     color: rgb(112, 23, 255);
 }
 
-a:visited {
+a:not(.chat-option):visited {
     color: rgb(116, 90, 169)
 }
 

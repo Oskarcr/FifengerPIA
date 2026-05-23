@@ -17,12 +17,36 @@ export default function ChatList() {
     const username = sessionStorage.getItem("username");
         
     const children = [];
+
+    const didFetch = useRef(false);
+
+    useEffect(() => {
+        if(didFetch.current) return;
+        didFetch.current = true;
+        (async () => {
+            const userId = sessionStorage.getItem("id");
+            api.get("conversations?userId=" + userId).then((response) => {
+                setConversations(response.data);
+            });
+        })();
+    }, []);
     
     for(let i = 0; i < conversations.length; i++) {
         const item = conversations[i];
-        const name = item.isGroup ? item.name : item.participants.find(a => a.username != username)?.username;
+        let name = null;
+        let photoUrl = null;
+        if(item.isGroup) {
+            name = item.name;
+            photoUrl = "/rewards/fifa.png";
+        }
+        else {
+            const user = item.participants.find(a => a.username != username);
+            name = user.username;
+            photoUrl = user.photoId;
+        }
         children.push(<Components.ChatOption 
             name={name} 
+            photoSrc={photoUrl}
             to={"/chats/" + conversations[i]._id}
         />);
     }
@@ -46,20 +70,7 @@ export default function ChatList() {
 
             setShowMessage(true);
         }
-        
     }
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const userId = sessionStorage.getItem("id");
-            api.get("conversations?userId=" + userId).then((response) => {
-                setConversations(response.data);
-            });
-        }, delay);
-        return () => {
-            clearTimeout(timer);
-        };
-    }, []);
 
     return (
     <>

@@ -1,8 +1,8 @@
 import { User } from "#FifengerModels";
+import { JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares } from "#FifengerServer";
 import { Router } from "express";
 import { isValidObjectId } from "mongoose";
 const users = Router();
-const USER_FIELDS = "username email status inventory";
 
 users.get("/search", async (req, res) => {
     try {
@@ -13,26 +13,36 @@ users.get("/search", async (req, res) => {
         }
         const user = await User.findOne({
             ...query
-        })
-        .select(USER_FIELDS);
+        });
 
         if(!user) return res.status(400).send("User not found");
 
-        res.status(200).send(user);
-    } catch (error) {
-        res.status(500).send("Search error");
+        res.status(200).json(Jsoner.user(user));
+    } 
+    catch (_) {
+        res.status(500).json(JSON_SERVER_ERROR);
     }
 });
 
-users.get("/:id", async (req, res) => {
-    const { id } = req.params;
+users.get("/:id", 
+    Middlewares.requireId,
+    async (req, res) => {
+        const { id } = req.params;
 
-    if(!isValidObjectId(id)) return res.status(400).send("User not found");
+        if(!isValidObjectId(id)) {
+            res.status(400).json(JSON_NOT_FOUND);
+            return;
+        }
 
-    const user = await User.findById(id).select(USER_FIELDS);
+        const user = await User.findById(id);
 
-    if(!user) return res.status(400).send("User not found");
-    res.send(user);
-});
+        if(!user) {
+            res.status(400).json(JSON_NOT_FOUND);
+            return;
+        }
+
+        res.json(Jsoner.user(user));
+    }
+);
 
 export default users;
