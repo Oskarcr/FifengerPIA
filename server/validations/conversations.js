@@ -4,7 +4,7 @@ import RequestValidator from "./RequestValidator.js";
 const conversations = new RequestValidator({
     id: {
         label: "conversation",
-        typre: String,
+        type: String,
         validate: (id) => {
             if(!isValidObjectId(id)) return "Invalid conversation ID."
         }

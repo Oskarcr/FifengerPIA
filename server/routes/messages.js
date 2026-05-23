@@ -2,7 +2,9 @@ import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId } from "mongoose";
 import { Server } from "socket.io";
+import Validators from "../validations/main.js";
 const messages = Router();
+const validator = Validators.messages;
 
 messages.get("/:conversationId",async (req, res) => {
     const { conversationId } = req.params;
@@ -17,11 +19,28 @@ messages.post("/", async (req, res) => {
     const io = req.app.get("io");
     if(!io) return res.status(500).send("Server error, try again later...");
 
-    const { senderId, content, conversationId, destinatorId } = req.body;
+    const body = validator.parseBody(req.body);
 
-    if(typeof content !== "string") return res.status(400).send("Content must be 'string'");
+    const empties = validator.empties(body, "content");
 
-    if(!isValidObjectId(senderId)) return res.status(400).send("SenderId is not id");
+    if(empties.length > 0) {
+        res.status(400).json({
+            empties
+        });
+        return;
+    }
+
+    const errors = validator.validate(body);
+
+    if(errors.length > 0) {
+        res.status(400).json({
+            errors
+        });
+        return;
+    }
+
+    const { content, conversationId, destinatorId, senderId } = body;
+    //const { senderId, content, conversationId, destinatorId } = req.body;
 
     if ((conversationId && destinatorId)) {
         return res.status(400).send("Invalid payload combination");
@@ -32,12 +51,9 @@ messages.post("/", async (req, res) => {
     if(!sender) return res.status(400).send("User Sender not found with senderId");
 
     if(conversationId) {
-        if(!isValidObjectId(conversationId)) return res.status(400).send("ConversationId is not id");
         conversation = await Conversation.findById(conversationId);
     }
     else {
-        if(!isValidObjectId(destinatorId)) return res.status(400).send("DestinatorId is not id");
-
         const participants = [senderId, destinatorId];
 
         conversation = await Conversation.findOne({
