@@ -13,7 +13,14 @@ export function setEventsToSocket(socket, io) {
     socket.on("join_conversation", (data) => {
         const { conversationId } = data;
         if(!conversationId) return;
-        socket.join(conversationId);
+
+
+    console.log("JOIN", socket.id, conversationId);
+
+    socket.join(conversationId);
+
+    console.log(socket.rooms);
+        //socket.join(conversationId);
         // console.log("Socket " + socket.id + " unido a la sala: " + conversationId);
     });
 

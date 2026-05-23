@@ -1,5 +1,5 @@
 body {
-    --spacing-short: 10px;
+    --spacing-short: 8px;
     --font-size-short: 0.9rem;
     --font-size-medium: 1.15rem;
     --font-size-long: 1.3rem;
@@ -9,11 +9,11 @@ body {
 }
 
 #header, .chat-input-area {
-    height: 70px;
+    height: 62px;
 }
 
 .button-icon .mso {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
 }
 
 .chat-option {  

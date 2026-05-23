@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 import http from "http";
 import { Server as SocketServer } from "socket.io";
 
-const port = process.env["SERVER_PORT"];
+const port = parseInt(process.env["SERVER_PORT"]);
 const url = process.env["DATABASE_URL"];
 
 const server = http.createServer(app);
 
 const io = new SocketServer(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: true,
         credentials: true
     }
 });
@@ -33,7 +33,7 @@ async function start() {
         setEventsToSocket(socket, io);
     });
 
-    server.listen(port, () => {
+    server.listen(port, "0.0.0.0", () => {
         console.log("App listeting on http://localhost:" + port);
     });
 }

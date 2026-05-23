@@ -1,11 +1,3 @@
-.chat-layout {
-    display: flex;
-    height: 100vh;
-    background-color: var(--primary-color-1);
-    color: white;
-    font-family: sans-serif;
-}
-
 .chat-item {
     padding: var(--spacing-short);
     display: flex;

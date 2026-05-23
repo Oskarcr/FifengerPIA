@@ -37,7 +37,7 @@ class RequestValidationData {
      * funcion te servira de esta manera:
      * @example
      * normalize: (v) => v.trim().toLowerCase() 
-     * @type {(value: InferType<T> => InferType<T>)}
+     * @type {((value: InferType<T>) => InferType<T>)}
      */
     normalize = null;
 
@@ -49,7 +49,7 @@ class RequestValidationData {
      * El parametro `value` siempre será de tipo especificado 
      * `type` al llamarse y siempre estara normalizado en
      * caso de que hayas puesto la funcion `normalize()`.
-     * @type {(value: InferType<T>) => string | null}
+     * @type {((value: InferType<T>) => string | null)}
      */
     validate = null;
 
@@ -99,9 +99,8 @@ class RequestValidator {
     /**
      * Retorna `true` si `value` es de tipo `type`.
      * En otro caso será `false`.
-     * @template V
      * @param {any} value 
-     * @param {new () => V} type 
+     * @param {Function} type 
      */
     static isType(value, type) {
         switch(type) {
@@ -132,7 +131,7 @@ class RequestValidator {
 
     /**
      * Retorna `true` si `value` esta vacio.
-     * @param {string} value 
+     * @param {any} value 
      */
     static isEmpty(value) {
         return value === undefined || value === null || value === "";
@@ -141,7 +140,7 @@ class RequestValidator {
     /**
      * 
      * @param {any} value 
-     * @param {new () => V} type 
+     * @param {Function} type 
      * @returns 
      */
     static parseFormValue(value, type) {
@@ -181,10 +180,11 @@ class RequestValidator {
     /**
      * Crea un nuevo `RequestValidator` mediante los
      * datos de `schema`.
-     * @param {{ [K in keyof T]: RequestValidationData<T[K]>}} schema
+     * @param {{ [K in keyof T]: Partial<RequestValidationData<T[K]>>}} schema
      */
     constructor(schema) {
-        const parsedSchema = {};
+        /**@type {{ [K in keyof T]: RequestValidationData<T[K]>}} */
+        const parsedSchema = /** @type {any} */ ({});
         for(const rule in schema) {
             parsedSchema[rule] = new RequestValidationData(schema[rule]);
         }
@@ -200,9 +200,10 @@ class RequestValidator {
      */
     parseBody(unparsedBody) {
         /** @type {RequestValidationParsedSchema<T>} */
-        const result = {};
+        const result = /**@type {any} */ ({});
         for(const k in this.#schema) {
-            const type = this.#schema[k].type;
+            /**@type {Function} */
+            const type = /** @type {any} */ (this.#schema[k].type);
             if(unparsedBody[k] === undefined || unparsedBody[k] === "") continue;
             const normalize = this.#schema[k].normalize;
             const value = unparsedBody[k];
@@ -224,15 +225,17 @@ class RequestValidator {
         const errors = [];
         for(const k in this.#schema) {
             if(k in body === false) continue;
-            if(!RequestValidator.isType(body[k], this.#schema[k].type)) {
+            const type = /** @type {Function} */ (this.#schema[k].type);
+            const value = /** @type {InferType<T[Extract<keyof T, string>]>} */ (body[k]);
+            if(!RequestValidator.isType(value, type)) {
                 const label = this.#schema[k].label || k;
-                const t = RequestValidator.#mapNames[this.#schema[k].type?.name] ?? "?";
+                const t = RequestValidator.#mapNames[type.name] ?? "?";
                 errors.push("El campo '" + label + "' debe ser " + t + ".");
                 continue;
             }
             const validate = this.#schema[k].validate;
             if(!validate) continue;
-            const result = validate(body[k]);
+            const result = validate(value);
             if(result) errors.push(result);
         }
         return errors;
@@ -256,7 +259,7 @@ class RequestValidator {
         for(const key of args) {
             const value = body[key];
             if(RequestValidator.isEmpty(value)) {
-                const label = this.#schema[key].label || key;
+                const label = this.#schema[key].label || String(key);
                 errors.push("El campo '" + label + "' esta vacio.");
                 continue;
             }
