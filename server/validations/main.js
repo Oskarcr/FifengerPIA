@@ -1,7 +1,11 @@
+import conversations from "./conversations.js";
+import messages from "./messages.js";
 import user from "./user.js";
 
 const Validators = {
-    user
+    user,
+    messages,
+    conversations
 };
 
 Object.freeze(Validators);
