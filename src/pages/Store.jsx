@@ -1,6 +1,8 @@
 import { Components } from "@/FifengerClient";
-import "../css/Store.css";
 import { useNavigate } from "react-router-dom";
+
+// @ts-ignore
+import "../css/Store.css";
 
 export default function Store() {
     const navigate = useNavigate();
@@ -15,7 +17,7 @@ export default function Store() {
     ];
 
     const children = storeItems.map((item) => (
-        <Components.StoreItem name={item.name} price={item.price}/>
+        <Components.StoreItem name={item.name} price={item.price + ""}/>
     ));
 
     return (<>
