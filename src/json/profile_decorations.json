@@ -1,62 +1,80 @@
 {
     "1": {
-        "label": "",
-        "type": "banner",
-        "url": "",
+        "label": "Soccer Ball",
+        "type": "pfp",
+        "url": "ball.png",
         "points": 0
     },
     "2": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "Field",
+        "type": "banner",
+        "url": "court.png",
+        "points": 0 
     },
     "3": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "France",
+        "type": "banner",
+        "url": "france_2018.png",
+        "points": 9500
     },
     "4": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "Relentless Defense",
+        "type": "banner",
+        "url": "goalkeeper.png",
+        "points": 6000
     },
     "5": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "Staidum",
+        "type": "banner",
+        "url": "stadium.png",
+        "points": 6000
     },
     "6": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "Perfect Shoot",
+        "type": "banner",
+        "url": "shoot.png",
+        "points": 2000
     },
     "7": {
-        "label": "",
-        "type": "pfp",
-        "url": "",
-        "points": 0
+        "label": "Champion 2022",
+        "type": "banner",
+        "url": "argentina_2022.png",
+        "points": 9500
     },
     "8": {
-        "label": "",
+        "label": "FIFA Logo",
         "type": "pfp",
-        "url": "",
+        "url": "fifa.png",
         "points": 0
     },
     "9": {
-        "label": "",
+        "label": "Gignac",
         "type": "pfp",
-        "url": "",
-        "points": 0
+        "url": "gignac.png",
+        "points": 6500
     },
     "10": {
-        "label": "",
+        "label": "Ronaldinho Soccer",
         "type": "pfp",
-        "url": "",
-        "points": 0
+        "url": "ronaldinho.png",
+        "points": 12000
+    },
+    "11": {
+        "label": "Ronaldo",
+        "type": "pfp",
+        "url": "ronaldo.png",
+        "points": 8000
+    },
+    "12": {
+        "label": "Trophy",
+        "type": "pfp",
+        "url": "trophy.png",
+        "points": 3000
+    },
+    "13": {
+        "label": "Messi",
+        "type": "pfp",
+        "url": "messi.png",
+        "points": 8000
     }
 }
