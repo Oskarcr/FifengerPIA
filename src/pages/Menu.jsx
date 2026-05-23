@@ -1,4 +1,4 @@
-import { Components } from "@/FifengerClient";
+import { Components, socket } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
 import MENU_OPTIONS from "../json/menu_options.json";
 import { useState } from "react";
@@ -8,6 +8,7 @@ export default function Menu() {
 
     const onClicks = {
         "login": () => {
+            socket.emit("user_disconnected");
             sessionStorage.clear();
         }
     };
