@@ -1,8 +1,7 @@
 import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
-import { isValidObjectId } from "mongoose";
 import { Server } from "socket.io";
-import Validators from "../validations/main.js";
+import { Validators } from "#FifengerServer";
 const messages = Router();
 const validator = Validators.messages;
 
@@ -40,7 +39,6 @@ messages.post("/", async (req, res) => {
     }
 
     const { content, conversationId, destinatorId, senderId } = body;
-    //const { senderId, content, conversationId, destinatorId } = req.body;
 
     if ((conversationId && destinatorId)) {
         return res.status(400).send("Invalid payload combination");

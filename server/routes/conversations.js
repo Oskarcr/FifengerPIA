@@ -1,9 +1,7 @@
 import { Conversation } from "#FifengerModels";
 import { Router } from "express";
-import Validators from "../validations/main.js";
 import { isValidObjectId } from "mongoose";
 const conversations = Router();
-const validator = Validators.conversations;
 
 conversations.get("/", async (req, res) => {
     const query = req.query;
