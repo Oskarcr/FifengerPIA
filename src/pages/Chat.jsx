@@ -1,7 +1,9 @@
-import { Components, api, socket } from "@/FifengerClient";
-import "../css/Chat.css";
+import { Components, api, getLocationURL, socket } from "@/FifengerClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+
+// @ts-ignore
+import "../css/Chat.css";
 
 export default function Chat() {
     const delay = 0.15 * 1000;
@@ -85,10 +87,16 @@ export default function Chat() {
         };
     }, [conversationId]);
 
-    const sendMessage = async () => {
+    const showErrors = (error) => {
+        alert(error.response.data.errors);
+    }
+
+    /**
+     * Envia un mensaje al chat.
+     * @param {string} content 
+     */
+    const sendMessage = async (content) => {
         const senderId = sessionStorage.getItem("id");
-        const content = messageInputRef.current.value;
-        messageInputRef.current.value = "";
         try {
             const response = await api.post("messages", {
                 senderId: senderId,
@@ -99,7 +107,36 @@ export default function Chat() {
             if(isTemp) navigate("/chat/" + response.data.conversationId);
         }
         catch(error) {
-            alert(error.response.data);
+            showErrors(error);
+        }
+    }
+
+    const onSendMessage = async () => {
+        const content = messageInputRef.current.value;
+        messageInputRef.current.value = "";
+        sendMessage(content);
+    }
+
+    const onSendLocation = async () => {
+        const locationURL = await getLocationURL();
+        if(!locationURL) {
+            alert("No se pudo obtener la ubicacion.");
+            return;
+        }
+        sendMessage(locationURL);
+    }
+
+    const onGroupAdd = async () => {
+        const senderId = sessionStorage.getItem("id");
+        try {
+            const { data: group } = await api.post("/conversations/group", {
+                name : "Grupito",
+                conversationId: conversationId
+            });
+            navigate("/chats/" + group.id);
+        }
+        catch(error) {
+            showErrors(error);
         }
     }
 
@@ -126,8 +163,8 @@ export default function Chat() {
                 </span>
             </Components.Flexed>
             <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
-            <Components.ButtonIcon icon="location_on" />
-            <Components.ButtonIcon icon="group_add" />
+            <Components.ButtonIcon icon="location_on" onClick={onSendLocation}/>
+            <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
         </div>
         <div id="root-content" style={{
             flex: 1,
@@ -154,7 +191,7 @@ export default function Chat() {
                         placeholder="Escribe un mensaje futbolero..."
                     />
                 </div>
-                <Components.ButtonIcon onClick={() => sendMessage()} icon="send" darkgray/>
+                <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
             </footer>
         </div>
     </>);

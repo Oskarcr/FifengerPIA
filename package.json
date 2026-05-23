@@ -8,7 +8,7 @@
     "#FifengerModels": "./server/models/main.js"
   },
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\" \"start http://localhost:5173\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node --env-file=.env.local server.js",
     "client": "vite",
     "build": "vite build",
@@ -31,6 +31,7 @@
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-basic-ssl": "2.3.0",
     "@vitejs/plugin-react": "^5.1.1",
     "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
