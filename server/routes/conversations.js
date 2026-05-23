@@ -1,14 +1,63 @@
-import { Conversation } from "#FifengerModels";
+import { Conversation, User } from "#FifengerModels";
 import { Router } from "express";
-import { isValidObjectId } from "mongoose";
+import Validators from "../validations/main.js";
+import { isValidObjectId, Types } from "mongoose";
+import { JSON_SERVER_ERROR, Jsoner } from "#FifengerServer";
 const conversations = Router();
+
+conversations.post("/group", async (req, res) => {
+    const { conversationId } = req.body;
+    const invalid_group_members = {
+        errors: ["El grupo base es invalido."]
+    };
+
+    if(!isValidObjectId(conversationId)) {
+        return res.status(400).json(invalid_group_members);
+    }
+
+    const body = validator.parseBody(req.body);
+
+    const errors = validator.validate(body);
+    if(errors.length > 0) {
+        res.status(400).json({ errors });
+        return;
+    }
+
+    const empties = validator.empties(body, "name");
+    if(empties.length > 0) {
+        res.status(400).json({ errors: empties });
+        return;
+    }
+
+    const { name } = body;
+
+    try {
+        const base = await Conversation.findById(conversationId);
+
+        if(!base) {
+            res.status(400).json(invalid_group_members);
+            return;
+        }
+
+        const conversation = await Conversation.create({
+            name: name,
+            isGroup: true,
+            participants: base.participants
+        });
+
+        return Jsoner.conversation(conversation);
+    }
+    catch(_) {
+        res.status(500).json(JSON_SERVER_ERROR);
+    }
+});
 
 conversations.get("/", async (req, res) => {
     const query = req.query;
 
     if(!query) return res.status(400).send("User not found");
 
-    const userId = query.userId;
+    const userId = query.userId + "";
 
     if(!isValidObjectId(userId)) return res.status(400).json({
         message: "Invalid user ID."
@@ -16,7 +65,7 @@ conversations.get("/", async (req, res) => {
     
     const conversations = await Conversation.find({
         participants: {
-            $in: [userId] // $in es que se encuentre en la lista
+            $in: [new Types.ObjectId(userId)]
         }
     }).populate("participants", "username");
     

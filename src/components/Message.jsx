@@ -1,5 +1,16 @@
 export default function Message({sender="", content="", timestamp = Date.now()}) {
     
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    const parts = content.split(urlRegex);
+
+    const contentArry = parts.map((part, i) => {
+        return (urlRegex.test(part) ? 
+            (<a key={i} href={part} target="_blank" rel="noreferrer">
+                {part}
+            </a>) : part)
+    });
+
     const date = new Date(timestamp);
     const time = date.toLocaleString("en-US", {
         month: "2-digit",
@@ -22,7 +33,7 @@ export default function Message({sender="", content="", timestamp = Date.now()})
                 <span className="message-sender">{sender}</span>
                 <span className="message-time">{time}</span>
             </div>
-            <p className="message-content">{content}</p>
+            <p className="message-content">{contentArry}</p>
         </div>
     </div>);
 }
