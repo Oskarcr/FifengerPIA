@@ -20,6 +20,10 @@ MessageSchema.index({
     createdAt: -1
 });
 
+MessageSchema.pre("find", function() {
+    this.sort({ createdAt: -1 }).limit(50);
+});
+
 const Message = model("Message", MessageSchema);
 
 export default Message;

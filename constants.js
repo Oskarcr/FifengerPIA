@@ -30,28 +30,28 @@ const QUERY_ACTIVE_ONLY = {
  * Un json que indica error de servidor.
  */
 const JSON_SERVER_ERROR = { 
-    errors: ["Error del servidor."]
+    errors: ["Server error, please, try again later..."]
 };
 
 /**
  * Un json donde se indica que no hay registros con el `id` especificado.
  */
 const JSON_NOT_FOUND = {
-    errors: ["No se encontraron registros que coincidieran en el id."]
+    errors: ["No record matches the id."]
 };
 
 /**
  * Un json que indica que el campo `id` no se proporcionó.
  */
 const JSON_MISSING_ID = {
-    errors: ["No se proporciono el campo 'id'."]
+    errors: ["The 'id' field was not provided."]
 };
 
 /**
  * Un json que le indica al usuario que todo salio bien.
  */
 const JSON_OK = {
-    message: "Se realizo la acción correctamente."
+    message: "The action was successfully completed."
 };
 
 export {

@@ -1,27 +1,32 @@
-class JsonParser {
+class Jsoner {
 
-    conversation(a) {
+    static conversation(a) {
         return {
             name: a.name,
             id: a.id,
-            participants: a.participants.map(a => this.user(a))
+            participants: a.participants.map(Jsoner.user)
         };
     }
 
-    user(a) {
+    static user(a) {
         return {
             username: a.username,
             email: a.email,
             photoId: a.photoId,
             bannerId: a.bannerId,
             inventory: [1, 2].concat(a.inventory),
-            status: a.status
+            status: a.status,
+            points: a.points
+        }
+    }
+
+    static message(a) {
+        return {
+            content: a.content,
+            isEncrypted: a.isEncrypted,
+            user: Jsoner.user(a.user)
         }
     }
 }
-
-const Jsoner = new JsonParser();
-
-Object.freeze(Jsoner);
 
 export default Jsoner;

@@ -1,5 +1,5 @@
 body {
-    --spacing-short: 8px;
+    --spacing-short: 10px;
     --font-size-short: 0.9rem;
     --font-size-medium: 1.15rem;
     --font-size-long: 1.3rem;
@@ -56,4 +56,8 @@ body {
 
 .message-button-container{
     height: 60px;
+}
+
+.item-card > img {
+    height: 300px;
 }

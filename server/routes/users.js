@@ -2,6 +2,7 @@ import { User } from "#FifengerModels";
 import { JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares } from "#FifengerServer";
 import { Router } from "express";
 import { isValidObjectId } from "mongoose";
+import requireId from "../middlewares/requireId.js";
 const users = Router();
 
 users.get("/search", async (req, res) => {
@@ -42,6 +43,13 @@ users.get("/:id",
         }
 
         res.json(Jsoner.user(user));
+    }
+);
+
+users.post("/buy/:id", 
+    requireId,
+    () => {
+
     }
 );
 

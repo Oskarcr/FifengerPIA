@@ -1,23 +1,44 @@
-import { Components } from "@/FifengerClient";
+import { api, Components } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
+import profile_decorations from "../json/profile_decorations.json";
 
 // @ts-ignore
 import "../css/Store.css";
+import { useEffect, useRef, useState } from "react";
 
 export default function Store() {
     const navigate = useNavigate();
 
-    const userPoints = 90;
+    const [items, setItems] = useState([]);
+    const [points, setPoints] = useState(0);
+    const didFetch = useRef(false);
 
-    const storeItems = [
-        { name: "Item", price: 300 },
-        { name: "Item", price: 500 },
-        { name: "Item", price: 250 },
-        { name: "Item", price: 800 },
-    ];
+    useEffect(() => {
+        if(didFetch.current) return;
+        didFetch.current = true;
+        const userId = sessionStorage.getItem("id");
+        (async () => {
+            try {
+                const { data } = await api.get("/users/" + userId);
+                const decorations = structuredClone(profile_decorations);
+                for(const item of data.inventory) {
+                    delete decorations[item];
+                }
+                setPoints(data.points);
+                setItems(Object.values(decorations));
+            }
+            catch(_) {}
+        })();
+        
+    }, []);
 
-    const children = storeItems.map((item) => (
-        <Components.StoreItem name={item.name} price={item.price + ""}/>
+    const children = items.map((item) => (
+        <Components.StoreItem 
+            name={item.label} 
+            price={item.points}
+            type={item.type}
+            src={"/rewards/" + item.url}
+        />
     ));
 
     return (<>
@@ -27,12 +48,15 @@ export default function Store() {
                 Store 
             </Components.Flexed>
             <div className="points-display">
-                Available: <span>{userPoints + " points"}</span>
+                Available: <span>{points + " points"}</span>
             </div>
         </div>
         <div id="root-content" style={{
             display: "flex",
             alignItems: "center",
+            overflow: "auto"
+        }} onWheel={(evt) => {
+            evt.currentTarget.scrollLeft += evt.deltaY;
         }}>
             <div style={{
                 display: "flex",

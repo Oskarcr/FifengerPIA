@@ -5,7 +5,7 @@ import profile_decorations from "../json/profile_decorations.json";
  * @property {string} label
  * @property {string} url
  * @property {number} points
- * @property {"banner" | "pfp"} type
+ * @property {"banner" | "picture"} type
  */
 
 class ItemManager {

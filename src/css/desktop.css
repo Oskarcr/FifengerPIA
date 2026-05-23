@@ -63,3 +63,7 @@ body {
 .message-button-container {
     height: 100px;
 }
+
+.item-card > img {
+    height: 360px;
+}

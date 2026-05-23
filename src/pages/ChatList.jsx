@@ -1,4 +1,4 @@
-import { api, Components } from "@/FifengerClient";
+import { api, Components, Items } from "@/FifengerClient";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MessageBox from "../components/MessageBox.jsx";
@@ -25,7 +25,7 @@ export default function ChatList() {
         didFetch.current = true;
         (async () => {
             const userId = sessionStorage.getItem("id");
-            api.get("conversations?userId=" + userId).then((response) => {
+            api.get("/conversations?userId=" + userId).then((response) => {
                 setConversations(response.data);
             });
         })();
@@ -35,18 +35,19 @@ export default function ChatList() {
         const item = conversations[i];
         let name = null;
         let photoUrl = null;
+        console.log(item);
         if(item.isGroup) {
             name = item.name;
-            photoUrl = "/rewards/fifa.png";
+            photoUrl = "fifa.png";
         }
         else {
             const user = item.participants.find(a => a.username != username);
             name = user.username;
-            photoUrl = user.photoId;
+            photoUrl = Items.get(user.photoId).url;
         }
         children.push(<Components.ChatOption 
             name={name} 
-            photoSrc={photoUrl}
+            photoSrc={"/rewards/" + photoUrl}
             to={"/chats/" + conversations[i]._id}
         />);
     }
@@ -54,7 +55,7 @@ export default function ChatList() {
     const searchConversation = async () => {
         const value = searchInputRef.current.value;
         try {
-            const response = await api.get("users/search?email=" + value);
+            const response = await api.get("/(users/search?email=" + value);
             navigate("temp/" + response.data._id);
             /*const id = response.data[0]._id;
             navigate("/chat/" + id);*/
