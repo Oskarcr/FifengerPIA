@@ -4,7 +4,6 @@ import Validators from "../validations/main.js";
 import { isValidObjectId, Types } from "mongoose";
 import { JSON_SERVER_ERROR, Jsoner } from "#FifengerServer";
 const conversations = Router();
-const validator = Validators.conversations;
 
 conversations.post("/group", async (req, res) => {
     const { conversationId } = req.body;

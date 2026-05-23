@@ -2,7 +2,6 @@ import { User } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId } from "mongoose";
 const users = Router();
-
 const USER_FIELDS = "username email status inventory";
 
 users.get("/search", async (req, res) => {

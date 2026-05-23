@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import Validators from "../validations/main.js";
+import { Validators } from "#FifengerServer";
 import { User } from "#FifengerModels";
 const auth = Router();
 const validator = Validators.user;

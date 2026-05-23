@@ -1,6 +1,7 @@
 import { api, Components } from "@/FifengerClient";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MessageBox from "../components/MessageBox.jsx";
 
 export default function ChatList() {
     const delay = 0.15 * 1000;
@@ -9,6 +10,9 @@ export default function ChatList() {
     const searchInputRef = useRef(null);
     const navigate = useNavigate();
     const [conversations, setConversations] = useState([]);
+    const [title, setTitle] = useState("");
+    const [message, setMessage] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
 
     const username = sessionStorage.getItem("username");
         
@@ -32,8 +36,15 @@ export default function ChatList() {
             navigate("/chat/" + id);*/
         }
         catch(error) {
-            //alert(error.response.data);
-            //navigate("/chats/temp/69e19d2398de6783ae110891");
+            console.log(error);
+
+            const data = error.response.data;
+
+            setTitle("Error");
+
+            setMessage(data);
+
+            setShowMessage(true);
         }
         
     }
@@ -50,11 +61,18 @@ export default function ChatList() {
         };
     }, []);
 
-    return (<>
+    return (
+    <>
+        {showMessage && (
+            <MessageBox title={title} content={message} onConfirm={() => {
+                setShowMessage(false);
+            }}/>
+        )}
+
         <div id="header">
             <Components.ButtonIcon icon="menu" onClick={() => navigate("/menu")} />
             <div className="header-search-container">
-                <input type="text" placeholder="Search user by username" ref={searchInputRef}/>
+                <input type="text" placeholder="Search user by email" ref={searchInputRef}/>
                 <Components.ButtonIcon onClick={() => searchConversation()} icon="search" />
             </div>
         </div>
@@ -66,5 +84,6 @@ export default function ChatList() {
         }}>
             {children}
         </div>
-    </>);
+    </>
+    );
 }

@@ -15,21 +15,21 @@ const messages = new RequestValidator({
         label: "sender",
         type: String,
         validate: (id) => {
-            if(!isValidObjectId(id)) return "SenderId is not a valid ID."
+            if(!isValidObjectId(id)) return "Sender account is invalid."
         }
     },
     conversationId: {
         label: "conversation",
         type: String,
         validate: (id) => {
-            if(!isValidObjectId(id)) return "Invalid conversation ID.";
+            if(!isValidObjectId(id)) return "This chat could not be found.";
         }
     },
     destinatorId: {
         label: "destinator",
         type: String,
         validate: (id) => {
-            if(!isValidObjectId(id)) return "Invalid destinator ID."
+            if(!isValidObjectId(id)) return "The receiver does not exist."
         }
     },
     isEncrypted: {
