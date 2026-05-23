@@ -15,6 +15,11 @@ const UserSchema = new Schema({
         required: true,
         default: 2
     },
+    points: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     inventory: [Number]
 });
 

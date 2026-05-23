@@ -38,7 +38,6 @@ body {
     --secondary-color-1: rgb(84, 208, 65);
     --secondary-color-2: rgb(255, 255, 255);
     --border-color: rgb(55, 57, 71);
-
     --border-radius: 20px;
     --border-size: 2px;
     --border: var(--border-size) var(--border-color) solid;
@@ -46,7 +45,6 @@ body {
     --transition-border: border-color 0.2s ease;
     --spacing-medium: calc(var(--spacing-short) * 1.5);
     --spacing-long: calc(var(--spacing-short) * 2);
-    --spacing-short: 14px;
 }
 
 /* CSS local */

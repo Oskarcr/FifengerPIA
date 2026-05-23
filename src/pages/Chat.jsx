@@ -1,4 +1,4 @@
-import { Components, api, getLocationURL, socket } from "@/FifengerClient";
+import { Components, Items, api, getLocationURL, socket } from "@/FifengerClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,6 +13,7 @@ export default function Chat() {
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
+    const didFetch = useRef(false);
 
     const isTemp = !!destinatorId;
 
@@ -45,11 +46,7 @@ export default function Chat() {
             }
             
         }, delay);
-
-        return () => {
-            clearTimeout(timer);
-        };
-    }, [isTemp, destinatorId, conversationId, delay]);
+    });
 
     useEffect(() => {
         const handler = (message) => {
@@ -69,23 +66,17 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        if(isTemp) return;
-        if (!conversationId) return;
+        if(didFetch.current || !conversationId) return;
+        didFetch.current = true;
 
-        let cancelable = true;
-
-        const timer = setTimeout(async () => {
-            cancelable = false;
-
-            api.get("messages/" + conversationId)
-            .then(res => setMessages(res.data));
-            
-        }, delay);
-         
-        return () => {
-            if(cancelable) clearTimeout(timer);
-        };
-    }, [conversationId]);
+        (async () => {
+            try {
+                const { data } = await api.get("/messages/" + conversationId);
+                setMessages(data);
+            }
+            catch(_) {}
+        })();
+    }, []);
 
     const showErrors = (error) => {
         alert(error.response.data.errors);
@@ -98,7 +89,7 @@ export default function Chat() {
     const sendMessage = async (content) => {
         const senderId = sessionStorage.getItem("id");
         try {
-            const response = await api.post("messages", {
+            const response = await api.post("/messages", {
                 senderId: senderId,
                 content: content,
                 destinatorId: destinatorId,
@@ -127,7 +118,6 @@ export default function Chat() {
     }
 
     const onGroupAdd = async () => {
-        const senderId = sessionStorage.getItem("id");
         try {
             const { data: group } = await api.post("/conversations/group", {
                 name : "Grupito",
@@ -142,11 +132,15 @@ export default function Chat() {
 
     const children = [];
 
+
     for(let i = 0; i < messages.length; i++) {
+        
+        const photoUrl = Items.get(messages[i].user.photoId).url;
         children.push(<Components.Message 
             timestamp={messages[i].createdAt}
             sender={messages[i].user.username}
             content={messages[i].content}
+            photoUrl={"/rewards/" + photoUrl}
         />);
     }
 

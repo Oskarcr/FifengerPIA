@@ -1,7 +1,7 @@
 {
     "1": {
         "label": "Soccer Ball",
-        "type": "pfp",
+        "type": "picture",
         "url": "ball.png",
         "points": 0
     },
@@ -42,38 +42,32 @@
         "points": 9500
     },
     "8": {
-        "label": "FIFA Logo",
-        "type": "pfp",
-        "url": "fifa.png",
-        "points": 0
-    },
-    "9": {
         "label": "Gignac",
-        "type": "pfp",
+        "type": "picture",
         "url": "gignac.png",
         "points": 6500
     },
-    "10": {
+    "9": {
         "label": "Ronaldinho Soccer",
-        "type": "pfp",
+        "type": "picture",
         "url": "ronaldinho.png",
         "points": 12000
     },
-    "11": {
+    "10": {
         "label": "Ronaldo",
-        "type": "pfp",
+        "type": "picture",
         "url": "ronaldo.png",
         "points": 8000
     },
-    "12": {
+    "11": {
         "label": "Trophy",
-        "type": "pfp",
+        "type": "picture",
         "url": "trophy.png",
         "points": 3000
     },
-    "13": {
+    "12": {
         "label": "Messi",
-        "type": "pfp",
+        "type": "picture",
         "url": "messi.png",
         "points": 8000
     }

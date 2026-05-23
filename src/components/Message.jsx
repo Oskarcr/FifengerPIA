@@ -1,4 +1,9 @@
-export default function Message({sender="", content="", timestamp = Date.now()}) {
+export default function Message({
+    sender="", 
+    content="", 
+    timestamp = Date.now(),
+    photoUrl = undefined,
+}) {
     
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     
@@ -22,7 +27,7 @@ export default function Message({sender="", content="", timestamp = Date.now()})
     }).replace(",", " at");
 
     return(<div className="message received">
-        <img src="/LTG.jpg"/>
+        <img src={photoUrl}/>
         <div style={{
             flex: 1,
             display: "flex",

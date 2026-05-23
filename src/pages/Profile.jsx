@@ -29,8 +29,8 @@ export default function Profile() {
         })();
     }, []);
 
-    const photoUrl = "/rewards/" + Items.get(user.photoId);
-    const bannerUrl = "/rewards/" + Items.get(user.bannerId);
+    const photoUrl = "/rewards/" + Items.get(user.photoId).url;
+    const bannerUrl = "/rewards/" + Items.get(user.bannerId).url;
 
     return (<>
         <div id="header">
@@ -70,7 +70,7 @@ export default function Profile() {
                     <div id="profile-acquisitions-container">
                         {user.inventory.map((a) => {
                             const item = Items.get(a);
-                            return <Components.ProfileAcquisition src={item.url}/>
+                            return <Components.ProfileAcquisition src={"/rewards/" + item.url}/>
                         })}
                     </div>
                 </div>

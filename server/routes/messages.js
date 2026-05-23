@@ -1,22 +1,32 @@
 import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
 import { Server } from "socket.io";
-import { Validators } from "#FifengerServer";
+import { JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
 const messages = Router();
 const validator = Validators.messages;
 
 messages.get("/:conversationId",async (req, res) => {
     const { conversationId } = req.params;
-    const messages = await Message.find({
-        conversationId
-    }).populate("user", "username email").sort({ createdAt: -1 });
-    res.send(messages);
+    try {
+        const messages = await Message.find({
+            conversationId
+        }).populate("user");
+        const data = messages.map(Jsoner.message);
+        res.status(200).json(data);
+    }
+    catch(_) {
+        console.log(_);
+        res.status(500).json(JSON_SERVER_ERROR);
+    }
 });
 
 messages.post("/", async (req, res) => {
     /**@type {Server} */
     const io = req.app.get("io");
-    if(!io) return res.status(500).send("Server error, try again later...");
+    if(!io) {
+        res.status(500).json(JSON_SERVER_ERROR);
+        return;
+    }
 
     const body = validator.parseBody(req.body);
 
