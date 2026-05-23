@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
-import { api } from "@/FifengerClient";
+import { api, socket } from "@/FifengerClient";
 import MessageBox from "../components/MessageBox.jsx";
 
 export default function Login() {
@@ -25,6 +25,8 @@ export default function Login() {
             sessionStorage.setItem("email", response.data.email);
             sessionStorage.setItem("id", response.data.id);
             navigate("/chats");
+
+            socket.emit("user_connected", response.data.id);
         }
         catch (error) {
             console.log(error);
