@@ -15,7 +15,7 @@ const messages = new RequestValidator({
         label: "sender",
         type: String,
         validate: (id) => {
-            if(isValidObjectId(id)) return "SenderId is not a valid ID."
+            if(!isValidObjectId(id)) return "SenderId is not a valid ID."
         }
     },
     conversationId: {
@@ -31,7 +31,7 @@ const messages = new RequestValidator({
         validate: (id) => {
             if(!isValidObjectId(id)) return "Invalid destinator ID."
         }
-    }
+    },
     isEncrypted: {
         label: "encripted",
         type: Boolean
