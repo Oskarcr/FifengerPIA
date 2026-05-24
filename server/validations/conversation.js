@@ -1,7 +1,7 @@
 import { isValidObjectId } from "mongoose";
 import RequestValidator from "./RequestValidator.js";
 
-const conversations = new RequestValidator({
+const conversation = new RequestValidator({
     id: {
         label: "conversation",
         type: String,
@@ -32,4 +32,4 @@ const conversations = new RequestValidator({
     }
 });
 
-export default conversations;
+export default conversation;

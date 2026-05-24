@@ -1,22 +1,64 @@
-import { Components } from "@/FifengerClient";
-import "../css/Store.css";
+import { api, Components, Items } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
+import profile_decorations from "../json/profile_decorations.json";
+
+// @ts-ignore
+import "../css/Store.css";
+import { useEffect, useRef, useState } from "react";
 
 export default function Store() {
     const navigate = useNavigate();
 
-    const userPoints = 90;
+    const [items, setItems] = useState([]);
+    const [points, setPoints] = useState(0);
+    const didFetch = useRef(false);
 
-    const storeItems = [
-        { name: "Item", price: 300 },
-        { name: "Item", price: 500 },
-        { name: "Item", price: 250 },
-        { name: "Item", price: 800 },
-    ];
+    useEffect(() => {
+        if(didFetch.current) return;
+        didFetch.current = true;
+        const userId = sessionStorage.getItem("id");
+        (async () => {
+            try {
+                const { data } = await api.get("/users/" + userId);
+                const decorations = structuredClone(profile_decorations);
+                for(const item of data.inventory) {
+                    delete decorations[item];
+                }
+                setPoints(data.points);
+                setItems(Object.entries(decorations));
+            }
+            catch(_) {}
+        })();
+        
+    }, []);
 
-    const children = storeItems.map((item) => (
-        <Components.StoreItem name={item.name} price={item.price}/>
-    ));
+    const showErrors = (error) => {
+        alert(error.response.data.errors);
+    }
+
+    const buyItem = async (id) => {
+        const userId = sessionStorage.getItem("id");
+        try {
+            await api.patch("/users/buy/" + id, {
+                userId: userId
+            });
+            window.location.reload();
+        }
+        catch(error) {
+            showErrors(error);
+        }
+    }
+
+    const children = items.map((entry) => {
+        const [id, value] = entry;
+        return <Components.StoreItem 
+            onBuy={() => buyItem(id)}
+            name={value.label} 
+            price={value.points}
+            type={value.type}
+            src={"/rewards/" + value.url}
+        />
+    });
 
     return (<>
         <div id="header">
@@ -25,12 +67,15 @@ export default function Store() {
                 Store 
             </Components.Flexed>
             <div className="points-display">
-                Available: <span>{userPoints + " points"}</span>
+                Available: <span>{points + " points"}</span>
             </div>
         </div>
         <div id="root-content" style={{
             display: "flex",
             alignItems: "center",
+            overflow: "auto"
+        }} onWheel={(evt) => {
+            evt.currentTarget.scrollLeft += evt.deltaY;
         }}>
             <div style={{
                 display: "flex",

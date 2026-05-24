@@ -4,6 +4,7 @@ import ButtonIcon from "../components/ButtonIcon";
 import ChatOption from "../components/ChatOption";
 import Flexed from "../components/Flexed";
 import Icon from "../components/Icon";
+import InputBox from "../components/InputBox.jsx";
 import MenuOption from "../components/MenuOption";
 import Message from "../components/Message";
 import ProfileAcquisition from "../components/ProfileAcquisition";
@@ -20,7 +21,8 @@ const Components = {
     MenuOption,
     Message,
     ProfileAcquisition,
-    StoreItem
+    StoreItem,
+    InputBox
 };
 
 Object.freeze(Components);

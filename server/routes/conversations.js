@@ -1,10 +1,12 @@
-import { Conversation, User } from "#FifengerModels";
+import { Conversation } from "#FifengerModels";
 import { Router } from "express";
-import Validators from "../validations/main.js";
 import { isValidObjectId, Types } from "mongoose";
-import { JSON_SERVER_ERROR, Jsoner } from "#FifengerServer";
+import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
+import authUser from "../middlewares/authUser.js";
+
 const conversations = Router();
-const validator = Validators.conversations;
+
+const validator = Validators.conversation;
 
 conversations.post("/group", async (req, res) => {
     const { conversationId } = req.body;
@@ -46,14 +48,18 @@ conversations.post("/group", async (req, res) => {
             participants: base.participants
         });
 
-        return Jsoner.conversation(conversation);
+        const conversationR = await Conversation
+            .findById(conversation._id)
+            .populate("participants");
+
+        return Jsoner.conversation(conversationR);
     }
     catch(_) {
         res.status(500).json(JSON_SERVER_ERROR);
     }
 });
 
-conversations.get("/", async (req, res) => {
+conversations.get("/", authUser, async (req, res) => {
     const query = req.query;
 
     if(!query) return res.status(400).send("User not found");
@@ -68,7 +74,7 @@ conversations.get("/", async (req, res) => {
         participants: {
             $in: [new Types.ObjectId(userId)]
         }
-    }).populate("participants", "username");
+    }).populate("participants");
     
     res.send(conversations);
 });

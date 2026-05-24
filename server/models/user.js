@@ -5,6 +5,21 @@ const UserSchema = new Schema({
     email: String,
     password: String,
     status: Number,
+    photoId: {
+        type: Number,
+        required: true,
+        default: 1
+    },
+    bannerId: {
+        type: Number,
+        required: true,
+        default: 2
+    },
+    points: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     inventory: [Number]
 });
 

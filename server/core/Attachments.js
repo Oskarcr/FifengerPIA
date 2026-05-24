@@ -1,13 +1,16 @@
 import Path from "path";
-import { writeFileSync, existsSync, unlinkSync } from "fs";
-import { ATTACHMENTS_DIR } from "#FifengerServer";
 import multer from "multer";
+import { createClient } from "@supabase/supabase-js";
 
 class AttachmentsManager {
     #storage = multer.memoryStorage();
     #uploader = multer({ 
         storage: this.#storage
     });
+    #supabase = createClient(
+        process.env["SUPABASE_URL"],
+        process.env["SUPABASE_PUBLISHABLE_KEY"]
+    );
     
     /**
      * Devuelve un middleware que procesa un unico archivo 
@@ -18,18 +21,20 @@ class AttachmentsManager {
         if(typeof fieldName !== "string") {
             throw new Error("El argumento 'fieldName' debe ser 'string'");
         }
-        return this.#uploader.single(fieldName)
+        return this.#uploader.single(fieldName);
     }
 
     /**
      * Borra un archivo de la carpeta `attachments/` mediante su url.
      * @param {string} attachmentUrl 
      */
-    delete(attachmentUrl) {
-        const path = Path.join(ATTACHMENTS_DIR, attachmentUrl);
+    async remove(attachmentUrl) {
         try {
-            if(!existsSync(path)) return false;
-            unlinkSync(path);
+            const { error } = await this.#supabase.storage
+            .from("attachments")
+            .remove([attachmentUrl]);
+
+            if(error) throw error;
             return true;
         }
         catch(_) {
@@ -39,20 +44,25 @@ class AttachmentsManager {
 
     /**
      * Guarda un archivo `Express.Multer.File` previamente 
-     * guardado en memoria `RAM` en la carpeta `attachments/`.
+     * guardado en memoria `RAM`.
      * 
      * Devuelve `true` si se completo y `false` en caso contrario.
      * @param {Express.Multer.File} file 
      */
-    save(file) {
+    async save(file) {
         const extension = Path.extname(file.originalname);
         const basename = Path.basename(file.originalname, extension);
         const fileOriginalName = (Date.now() + "_" + basename);
         const buffer = Buffer.from(fileOriginalName, "utf-8");
         const fileName = buffer.toString("base64url") + extension;
-        const filePath = Path.join(ATTACHMENTS_DIR, fileName);
-        writeFileSync(filePath, file.buffer);
-        return fileName;
+        const { error, data } = await this.#supabase.storage
+        .from("attachments")
+        .upload(fileName, file.buffer, {
+            contentType: file.mimetype
+        });
+
+        if(error) throw error;
+        return data.path;
     }
 }
 

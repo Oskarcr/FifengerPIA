@@ -38,7 +38,6 @@ body {
     --secondary-color-1: rgb(84, 208, 65);
     --secondary-color-2: rgb(255, 255, 255);
     --border-color: rgb(55, 57, 71);
-
     --border-radius: 20px;
     --border-size: 2px;
     --border: var(--border-size) var(--border-color) solid;
@@ -46,7 +45,6 @@ body {
     --transition-border: border-color 0.2s ease;
     --spacing-medium: calc(var(--spacing-short) * 1.5);
     --spacing-long: calc(var(--spacing-short) * 2);
-    --spacing-short: 14px;
 }
 
 /* CSS local */
@@ -55,12 +53,13 @@ button {
     color: var(--secondary-color-2);
 }
 
-a {
+a:not(.chat-option) {
+    overflow-wrap: break-word;
     text-decoration: underline;
     color: rgb(112, 23, 255);
 }
 
-a:visited {
+a:not(.chat-option):visited {
     color: rgb(116, 90, 169)
 }
 
@@ -276,6 +275,7 @@ a:visited {
 }
 
 .profile-acquisition {
+    cursor: pointer;
     display: inline-block;
     flex-shrink: 0;
     box-sizing: border-box;
@@ -488,7 +488,8 @@ input:focus {
     flex: 1;
     min-height: 200px;
     border-radius: var(--border-radius);
-    justify-content: center;
+    justify-content: left;
+    box-sizing: border-box;
     color: var(--secondary-color-2);
     background-color: var(--primary-color-2);
 }
@@ -504,4 +505,31 @@ input:focus {
     border-radius: var(--border-radius);
     background-color: var(--secondary-color-1);
     cursor: pointer;
+}
+
+.input-box {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 100;
+}
+
+.input-box-content {
+    width: 500px;
+    max-width: 80%;
+    padding: 24px;
+    border-radius: var(--border-radius);
+    border: var(--border);
+    background-color: var(--primary-color-2);
+}
+
+.input-box-title{
+    font-size: 1.5rem;
+}
+
+.input-box-field{
+    font-size: 1.1rem;
 }

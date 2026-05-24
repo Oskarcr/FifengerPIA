@@ -48,7 +48,6 @@
 }
 
 .item-card > img {
-    height: 360px;
     aspect-ratio: 5 / 7;
     object-fit: cover;
     border-radius: var(--border-radius);

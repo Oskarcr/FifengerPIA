@@ -1,0 +1,74 @@
+{
+    "1": {
+        "label": "Soccer Ball",
+        "type": "picture",
+        "url": "ball.png",
+        "points": 0
+    },
+    "2": {
+        "label": "Field",
+        "type": "banner",
+        "url": "court.png",
+        "points": 0 
+    },
+    "3": {
+        "label": "France",
+        "type": "banner",
+        "url": "france_2018.png",
+        "points": 3800
+    },
+    "4": {
+        "label": "Relentless Defense",
+        "type": "banner",
+        "url": "goalkeeper.png",
+        "points": 3700
+    },
+    "5": {
+        "label": "Staidum",
+        "type": "banner",
+        "url": "stadium.png",
+        "points": 2800
+    },
+    "6": {
+        "label": "Perfect Shoot",
+        "type": "banner",
+        "url": "shoot.png",
+        "points": 1000
+    },
+    "7": {
+        "label": "Champion 2022",
+        "type": "banner",
+        "url": "argentina_2022.png",
+        "points": 4900
+    },
+    "8": {
+        "label": "Gignac",
+        "type": "picture",
+        "url": "gignac.png",
+        "points": 5200
+    },
+    "9": {
+        "label": "Ronaldinho Soccer",
+        "type": "picture",
+        "url": "ronaldinho.png",
+        "points": 8000
+    },
+    "10": {
+        "label": "CR7 pride",
+        "type": "picture",
+        "url": "ronaldo.png",
+        "points": 6900
+    },
+    "11": {
+        "label": "Trophy",
+        "type": "picture",
+        "url": "trophy.png",
+        "points": 1800
+    },
+    "12": {
+        "label": "Messi",
+        "type": "picture",
+        "url": "messi.png",
+        "points": 6900
+    }
+}

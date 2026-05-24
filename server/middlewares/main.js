@@ -1,7 +1,9 @@
+import authUser from "./authUser.js";
 import requireId from "./requireId.js";
 
 const Middlewares = {
-    requireId
+    requireId,
+    authUser
 };
 
 Object.freeze(Middlewares);

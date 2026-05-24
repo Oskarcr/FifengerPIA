@@ -1,4 +1,4 @@
-import { Components, api, getLocationURL, socket } from "@/FifengerClient";
+import { Components, Items, api, getLocationURL, socket } from "@/FifengerClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import CryptoJS from "crypto-js"; // <-- 1. IMPORTAMOS LA LIBRERÍA
@@ -17,8 +17,11 @@ export default function Chat() {
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
+    const didFetch = useRef(false);
+    const inputAttachmentRef = useRef(null);
+    const formRef = useRef(null);
 
-    const isTemp = !!destinatorId;
+    const isTemp = Boolean(destinatorId);
 
     // Función auxiliar para desencriptar de forma segura sin romper la app si el texto no está cifrado
    const decryptMessage = (cipherText) => {
@@ -62,11 +65,7 @@ export default function Chat() {
             }
             
         }, delay);
-
-        return () => {
-            clearTimeout(timer);
-        };
-    }, [isTemp, destinatorId, conversationId, delay]);
+    });
 
     // <-- 3. DESENCRIPTAR AL RECIBIR MENSAJES EN TIEMPO REAL (SOCKETS)
     useEffect(() => {
@@ -89,30 +88,23 @@ export default function Chat() {
 
     // <-- 4. DESENCRIPTAR AL CARGAR EL HISTORIAL (API GET)
     useEffect(() => {
-        if(isTemp) return;
-        if (!conversationId) return;
-
-        let cancelable = true;
-
-        const timer = setTimeout(async () => {
-            cancelable = false;
-
-            api.get("messages/" + conversationId)
-            .then(res => {
-                // Mapeamos los mensajes que vienen de la base de datos y los desencriptamos todos
-                const decryptedMessages = res.data.map(msg => ({
-                    ...msg,
-                    content: decryptMessage(msg.content)
-                }));
-                setMessages(decryptedMessages);
-            });
-            
-        }, delay);
-         
-        return () => {
-            if(cancelable) clearTimeout(timer);
-        };
-    }, [conversationId]);
+        if(didFetch.current || !conversationId) return;
+        didFetch.current = true;
+        (async () => {
+            try {
+                api.get("messages/" + conversationId)
+                .then(res => {
+                    // Mapeamos los mensajes que vienen de la base de datos y los desencriptamos todos
+                    const decryptedMessages = res.data.map(msg => ({
+                        ...msg,
+                        content: decryptMessage(msg.content)
+                    }));
+                    setMessages(decryptedMessages);
+                });
+            }
+            catch(_) {}
+        })();
+    }, []);
 
     const showErrors = (error) => {
         alert(error.response.data.errors);
@@ -120,25 +112,21 @@ export default function Chat() {
 
     /**
      * Envia un mensaje al chat.
-     * @param {string} content 
+     * @param {FormData} data 
      */
-    // <-- 5. ENCRIPTAR ANTES DE ENVIAR (API POST)
-    const sendMessage = async (content) => {
+    const sendMessage = async (data) => {
+        if(data.has("content")) {
+            const encryptedContent = CryptoJS.AES.encrypt(data.get("content", SECRET_KEY).toString();
+            data.set("content", encryptedContent);
+        }
         const senderId = sessionStorage.getItem("id");
-        
-        // Aquí se encripta el mensaje
-        const encryptedContent = CryptoJS.AES.encrypt(content, SECRET_KEY).toString();
-
-        // 📸 ¡PON LA LÍNEA AQUÍ MERITO!
-        console.log("TEXTO ENCRIPTADO LISTO PARA ENVIAR A LA CAPA INTERMEDIA:", encryptedContent);
+        data.set("senderId", senderId);
+        if(destinatorId) data.set("destinatorId", destinatorId);
+        if(conversationId) data.set("conversationId", conversationId);
 
         try {
-            const response = await api.post("messages", {
-                senderId: senderId,
-                content: encryptedContent, 
-                destinatorId: destinatorId,
-                conversationId: conversationId
-            });
+            formRef.current.reset();
+            const response = await api.post("/messages", data);
             if(isTemp) navigate("/chat/" + response.data.conversationId);
         }
         catch(error) {
@@ -147,10 +135,8 @@ export default function Chat() {
     }
 
     const onSendMessage = async () => {
-        const content = messageInputRef.current.value;
-        if (!content.trim()) return; // Validamos que no envíe vacíos
-        messageInputRef.current.value = "";
-        sendMessage(content);
+        const data = new FormData(formRef.current);
+        sendMessage(data);
     }
 
     const onSendLocation = async () => {
@@ -159,11 +145,12 @@ export default function Chat() {
             alert("No se pudo obtener la ubicacion.");
             return;
         }
-        sendMessage(locationURL);
+        const data = new FormData();
+        data.set("content", locationURL);
+        sendMessage(data);
     }
 
     const onGroupAdd = async () => {
-        const senderId = sessionStorage.getItem("id");
         try {
             const { data: group } = await api.post("/conversations/group", {
                 name : "Grupito",
@@ -179,11 +166,14 @@ export default function Chat() {
     const children = [];
 
     for(let i = 0; i < messages.length; i++) {
+        const photoUrl = Items.get(messages[i].user.photoId).url;
         children.push(<Components.Message 
             key={messages[i].id || i} // Buena práctica añadir una key en React
             timestamp={messages[i].createdAt}
             sender={messages[i].user.username}
             content={messages[i].content}
+            attachmentUrl={messages[i].attachmentUrl}
+            photoUrl={"/rewards/" + photoUrl}
         />);
     }
 
@@ -199,7 +189,6 @@ export default function Chat() {
                 </span>
             </Components.Flexed>
             <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
-            <Components.ButtonIcon icon="location_on" onClick={onSendLocation}/>
             <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
         </div>
         <div id="root-content" style={{
@@ -214,22 +203,38 @@ export default function Chat() {
                 {children}
             </section>
 
-            <footer className="chat-input-area">
-                <Components.ButtonIcon icon="add" darkgray/>
+            <form ref={formRef} className="chat-input-area">
+                <Components.ButtonIcon 
+                    icon="add" 
+                    darkgray 
+                    onClick={() => inputAttachmentRef.current.click()}
+                />
+                <Components.ButtonIcon 
+                    icon="location_on" 
+                    darkgray 
+                    onClick={onSendLocation}
+                />
                 <div style={{
                     flex: 1,
                     display: "flex",
                     alignItems: "center"
                 }}>
+                    <input 
+                        ref={inputAttachmentRef}
+                        name="attachment" 
+                        type="file" 
+                        accept="image/*"
+                        style={{display: "none"}}
+                    />
                     <input
-                        ref={messageInputRef}
+                        name="content"
                         type="text"
                         placeholder="Escribe un mensaje encriptado..."
                         onKeyDown={(e) => e.key === 'Enter' && onSendMessage()} // Para enviar con Enter directo
                     />
                 </div>
                 <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
-            </footer>
+            </form>
         </div>
     </>);
 };
