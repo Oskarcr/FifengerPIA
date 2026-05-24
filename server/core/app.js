@@ -1,5 +1,6 @@
 import express from "express";
 import api from "./api.js";
+import cookieParser from "cookie-parser";
 
 const SUPABASE_URL = process.env["SUPABASE_URL"];
 
@@ -12,6 +13,8 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
+
+app.use(cookieParser());
 
 app.use(express.json());
 
