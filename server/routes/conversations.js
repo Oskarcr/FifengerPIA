@@ -1,19 +1,29 @@
-import { Conversation } from "#FifengerModels";
+import { Conversation, User } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { Attachments, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
+import { JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 
 const conversations = Router();
 
 const validator = Validators.conversation;
 
+// Crea un nuevo grupo mediante el email del usuario y el nombre del grupo, la id es de la conversacion
 conversations.post("/group", Middlewares.authUser, async (req, res) => {
-    const { conversationId } = req.body;
+    const { id, email } = req.body;
+
+    const emailNormalized = email.trim().toLowerCase();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const validEmail = emailRegex.test(emailNormalized);
+    
+    if(!validEmail) return res.status(400).json({
+        message: "Invalid email format."
+    })
+
     const invalid_group_members = {
         errors: ["El grupo base es invalido."]
     };
 
-    if(!isValidObjectId(conversationId)) {
+    if(!isValidObjectId(id)) {
         return res.status(400).json(invalid_group_members);
     }
 
@@ -33,28 +43,125 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
 
     const { name } = body;
 
+    console.log(emailNormalized);
+    console.log(id);
+    console.log(name);
+
     try {
-        const base = await Conversation.findById(conversationId);
+        const base = await Conversation.findById(id);
 
         if(!base) {
             res.status(400).json(invalid_group_members);
             return;
         }
 
+        let participantsList = [...base.participants];
+
+        if(emailNormalized){
+            const userToAdd = await User.findOne({ email: emailNormalized });
+            if(!userToAdd){
+                res.status(400).json({
+                    message: "The user to add does not exist."
+                });
+                return;
+            }
+            if(!participantsList.some(pId => pId.equals(userToAdd._id))){
+                participantsList.push(userToAdd._id);
+            }
+        }
+
         const conversation = await Conversation.create({
             name: name,
             isGroup: true,
-            participants: base.participants
+            participants: participantsList
         });
 
         const conversationR = await Conversation
             .findById(conversation._id)
             .populate("participants");
 
-        return Jsoner.conversation(conversationR);
+        console.log(emailNormalized);
+        console.log(id);
+        console.log(name);
+
+        return res.status(200).json(Jsoner.conversation(conversationR));
     }
     catch(_) {
         res.status(500).json(JSON_SERVER_ERROR);
+    }
+});
+
+conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.requireId, async (req, res) => {
+    const { id } = req.params;
+    const { email } = req.body;
+
+    const emailNormalized = email.trim().toLowerCase();
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const validEmail = emailRegex.test(emailNormalized);
+    
+    if(!validEmail) return res.status(400).json({
+        message: "Invalid email."
+    })
+
+    
+
+    /*
+    const { body } = validator.parseBody(req.body);
+
+    const empties = validator.empties(body, "email");
+
+    if(empties.length > 0) {
+        res.status(400).json({
+            empties
+        });
+        return;
+    }
+
+    const errors = validator.validate(body);
+
+    if(errors.length > 0){
+        res.status(400).json({
+            errors
+        });
+        return;
+    }
+    */
+
+    try {
+        const userToAdd = await User.findOne({
+            email: emailNormalized
+        });
+        
+        if (!userToAdd) {
+            return res.status(404).json({ message: "The user with that email does not exist." });
+        }
+
+        const conversation = await Conversation.findById(id);
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found." });
+        }
+
+        if (conversation.participants.includes(userToAdd._id)) {
+            return res.status(400).json({ message: "The user is already a member of this group." });
+        }
+
+        const alreadyExists = conversation.participants.some(pId => pId.equals(userToAdd._id));
+        if(alreadyExists){
+            return res.status(400).json({
+                message: "The user is already a member of this group."
+            })
+        }
+
+        conversation.participants.push(userToAdd._id);
+        await conversation.save();
+
+        const updatedConversation = await Conversation.findById(id).populate("participants");
+
+        return res.status(200).json(Jsoner.conversation(updatedConversation));
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(JSON_SERVER_ERROR);
     }
 });
 

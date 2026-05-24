@@ -7,6 +7,7 @@ import Icon from "../components/Icon";
 import InputBox from "../components/InputBox.jsx";
 import MenuOption from "../components/MenuOption";
 import Message from "../components/Message";
+import MessageBox from "../components/MessageBox.jsx";
 import ProfileAcquisition from "../components/ProfileAcquisition";
 import StoreItem from "../components/StoreItem";
 
@@ -22,6 +23,7 @@ const Components = {
     Message,
     ProfileAcquisition,
     StoreItem,
+    MessageBox,
     InputBox
 };
 

@@ -11,6 +11,10 @@ export default function Chat() {
     const { destinatorId, conversationId } = useParams();
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
+    const [title, setTitle] = useState("");
+    const [message, setMessage] = useState("");
+    const [showMessageBox , setShowMessageBox] = useState(false);
+    const [showInputBox, setShowInputBox] = useState(false);
     const navigate = useNavigate();
     const didFetch = useRef(false);
     const inputAttachmentRef = useRef(null);
@@ -139,14 +143,32 @@ export default function Chat() {
     }
 
     const onGroupAdd = async () => {
+        setTitle("Add");
+        setShowInputBox(true);
+    }
+
+    const addUser = async (email, groupName) => {
         try {
+            if(!email.trim()){
+                setTitle("Error");
+                setMessage("Enter a valid email.");
+                setShowInputBox(false);
+                setShowMessageBox(true);
+                return;
+            }
+
+            console.log(groupName);
+
             const { data: group } = await api.post("/conversations/group", {
-                name : "Grupito",
-                conversationId: conversationId
+                name: groupName ? groupName : "Grupito",
+                id: conversationId,
+                email: email
             });
             navigate("/chats/" + group.id);
         }
         catch(error) {
+            console.log(error.message);
+
             showErrors(error);
         }
     }
@@ -165,7 +187,18 @@ export default function Chat() {
         />);
     }
 
-    return (<>
+    return (
+    <>
+        {showMessageBox && (
+            <Components.MessageBox title={title} content={message} onConfirm={() => setShowMessageBox(false)}/>
+        )}
+
+        {showInputBox && (
+            <Components.InputBox doubleField title={title} onClose={() => setShowInputBox(false)}
+            onConfirm={(email, groupName) => addUser(email, groupName)} placeholderOne="User email" placeholderTwo="Group name">
+            </Components.InputBox>
+        )}
+
         <div id="header">
             <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chats")} />
             <Components.Flexed className="header-title">
@@ -224,5 +257,6 @@ export default function Chat() {
                 <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
             </form>
         </div>
-    </>);
+    </>
+    );
 };

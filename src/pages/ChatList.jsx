@@ -1,7 +1,6 @@
 import { api, Components, Items } from "@/FifengerClient";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MessageBox from "../components/MessageBox.jsx";
 
 export default function ChatList() {
     const delay = 0.15 * 1000;
@@ -79,7 +78,7 @@ export default function ChatList() {
     return (
     <>
         {showMessage && (
-            <MessageBox title={title} content={message} onConfirm={() => {
+            <Components.MessageBox title={title} content={message} onConfirm={() => {
                 setShowMessage(false);
             }}/>
         )}
