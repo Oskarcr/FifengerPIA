@@ -1,9 +1,13 @@
 import { Components, api, getLocationURL, socket } from "@/FifengerClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import CryptoJS from "crypto-js"; // <-- 1. IMPORTAMOS LA LIBRERÍA
 
 // @ts-ignore
 import "../css/Chat.css";
+
+// <-- 2. DEFINIMOS UNA CLAVE SECRETA (Debe ser la misma para Óscar y para ti)
+const SECRET_KEY = "ClaveSecretaMiddleware123";
 
 export default function Chat() {
     const delay = 0.15 * 1000;
@@ -16,6 +20,20 @@ export default function Chat() {
 
     const isTemp = !!destinatorId;
 
+    // Función auxiliar para desencriptar de forma segura sin romper la app si el texto no está cifrado
+   const decryptMessage = (cipherText) => {
+        // !!! AQUÍ MERITO VA LA LÍNEA !!!
+        console.log("Mensaje original encriptado desde la BD o Socket:", cipherText);
+
+        try {
+            const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
+            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+            return decrypted ? decrypted : cipherText;
+        } catch (e) {
+            return cipherText;
+        }
+    };
+
     useEffect(() => {
         if (!conversationId) return;
         socket.emit("join_conversation", {
@@ -25,7 +43,6 @@ export default function Chat() {
 
     useEffect(() => {
         let cancelable = true;
-
         const username = sessionStorage.getItem("username");
         
         const timer = setTimeout(() => {
@@ -51,10 +68,12 @@ export default function Chat() {
         };
     }, [isTemp, destinatorId, conversationId, delay]);
 
+    // <-- 3. DESENCRIPTAR AL RECIBIR MENSAJES EN TIEMPO REAL (SOCKETS)
     useEffect(() => {
         const handler = (message) => {
             setMessages((prev) => [{
                 ...message,
+                content: decryptMessage(message.content), // Desencriptamos el contenido que llega
                 user: {
                     username: message.username
                 }
@@ -68,6 +87,7 @@ export default function Chat() {
         };
     }, []);
 
+    // <-- 4. DESENCRIPTAR AL CARGAR EL HISTORIAL (API GET)
     useEffect(() => {
         if(isTemp) return;
         if (!conversationId) return;
@@ -78,7 +98,14 @@ export default function Chat() {
             cancelable = false;
 
             api.get("messages/" + conversationId)
-            .then(res => setMessages(res.data));
+            .then(res => {
+                // Mapeamos los mensajes que vienen de la base de datos y los desencriptamos todos
+                const decryptedMessages = res.data.map(msg => ({
+                    ...msg,
+                    content: decryptMessage(msg.content)
+                }));
+                setMessages(decryptedMessages);
+            });
             
         }, delay);
          
@@ -95,12 +122,20 @@ export default function Chat() {
      * Envia un mensaje al chat.
      * @param {string} content 
      */
+    // <-- 5. ENCRIPTAR ANTES DE ENVIAR (API POST)
     const sendMessage = async (content) => {
         const senderId = sessionStorage.getItem("id");
+        
+        // Aquí se encripta el mensaje
+        const encryptedContent = CryptoJS.AES.encrypt(content, SECRET_KEY).toString();
+
+        // 📸 ¡PON LA LÍNEA AQUÍ MERITO!
+        console.log("TEXTO ENCRIPTADO LISTO PARA ENVIAR A LA CAPA INTERMEDIA:", encryptedContent);
+
         try {
             const response = await api.post("messages", {
                 senderId: senderId,
-                content: content,
+                content: encryptedContent, 
                 destinatorId: destinatorId,
                 conversationId: conversationId
             });
@@ -113,6 +148,7 @@ export default function Chat() {
 
     const onSendMessage = async () => {
         const content = messageInputRef.current.value;
+        if (!content.trim()) return; // Validamos que no envíe vacíos
         messageInputRef.current.value = "";
         sendMessage(content);
     }
@@ -144,6 +180,7 @@ export default function Chat() {
 
     for(let i = 0; i < messages.length; i++) {
         children.push(<Components.Message 
+            key={messages[i].id || i} // Buena práctica añadir una key en React
             timestamp={messages[i].createdAt}
             sender={messages[i].user.username}
             content={messages[i].content}
@@ -159,7 +196,6 @@ export default function Chat() {
                     marginLeft: "var(--spacing-medium)",
                     fontSize: "var(--font-size-short)"
                 }}>
-                    {/* 12 miembros */}
                 </span>
             </Components.Flexed>
             <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
@@ -188,7 +224,8 @@ export default function Chat() {
                     <input
                         ref={messageInputRef}
                         type="text"
-                        placeholder="Escribe un mensaje futbolero..."
+                        placeholder="Escribe un mensaje encriptado..."
+                        onKeyDown={(e) => e.key === 'Enter' && onSendMessage()} // Para enviar con Enter directo
                     />
                 </div>
                 <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
