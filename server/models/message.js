@@ -6,6 +6,7 @@ const MessageSchema = new Schema({
         ref: "User"
     },
     content: String,
+    attachmentUrl: String,
     isEncrypted: Boolean,
     conversationId: {
         type: Schema.Types.ObjectId,
@@ -21,7 +22,7 @@ MessageSchema.index({
 });
 
 MessageSchema.pre("find", function() {
-    this.sort({ createdAt: -1 }).limit(50);
+    this.sort({ createdAt: -1 }).limit(40);
 });
 
 const Message = model("Message", MessageSchema);

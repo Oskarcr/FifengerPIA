@@ -1,6 +1,7 @@
 export default function Message({
     sender="", 
     content="", 
+    attachmentUrl=undefined,
     timestamp = Date.now(),
     photoUrl = undefined,
 }) {
@@ -32,13 +33,22 @@ export default function Message({
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
+            position: "relative",
+            minWidth: 0,
         }}>
             <div className="message-info">
                 <span className="message-sender">{sender}</span>
                 <span className="message-time">{time}</span>
             </div>
             <p className="message-content">{contentArry}</p>
+            { attachmentUrl && <img style={{
+                marginTop: "var(--spacing-medium)",
+                width: "min(100%, 512px)",
+
+                display: "block",
+                objectFit: "contain"
+            }} src={"/attachments/" + attachmentUrl}/>}
         </div>
     </div>);
 }

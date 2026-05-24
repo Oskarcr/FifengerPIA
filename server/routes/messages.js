@@ -1,7 +1,7 @@
 import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
 import { Server } from "socket.io";
-import { JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
+import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
 const messages = Router();
 const validator = Validators.messages;
 
@@ -15,94 +15,101 @@ messages.get("/:conversationId",async (req, res) => {
         res.status(200).json(data);
     }
     catch(_) {
-        console.log(_);
         res.status(500).json(JSON_SERVER_ERROR);
     }
 });
 
-messages.post("/", async (req, res) => {
-    /**@type {Server} */
-    const io = req.app.get("io");
-    if(!io) {
-        res.status(500).json(JSON_SERVER_ERROR);
-        return;
-    }
+messages.post("/", 
+    Attachments.single("attachment"),
+    async (req, res) => {
+        const file = req.file;
 
-    const body = validator.parseBody(req.body);
+        /**@type {Server} */
+        const io = req.app.get("io");
+        if(!io) {
+            res.status(500).json(JSON_SERVER_ERROR);
+            return;
+        }
 
-    const empties = validator.empties(body, "content");
+        const body = validator.parseBody(req.body);
+        const contentEmpty = validator.getEmptyMessage(body, "content");
 
-    if(empties.length > 0) {
-        res.status(400).json({
-            empties
-        });
-        return;
-    }
-
-    const errors = validator.validate(body);
-
-    if(errors.length > 0) {
-        res.status(400).json({
-            errors
-        });
-        return;
-    }
-
-    const { content, conversationId, destinatorId, senderId } = body;
-
-    if ((conversationId && destinatorId)) {
-        return res.status(400).send("Invalid payload combination");
-    }
-
-    let conversation = null;
-    const sender = await User.findById(senderId);
-    if(!sender) return res.status(400).send("User Sender not found with senderId");
-
-    if(conversationId) {
-        conversation = await Conversation.findById(conversationId);
-    }
-    else {
-        const participants = [senderId, destinatorId];
-
-        conversation = await Conversation.findOne({
-            participants: {
-                $all: participants,
-                $size: 2
-            }
-        });
-
-        // Si no existe la conversacion entre los individuos, crearla.
-
-        if(!conversation) {
-            const destinator = await User.findById(destinatorId);
-            if(!destinator) return res.status(400).send("User Destinator not found with destinatorId");
-            conversation = await Conversation.create({
-                participants: participants
+        if(!contentEmpty && !file) {
+            res.status(400).json({ 
+                errors: ["El mensaje esta completamente vacio."] 
             });
+            return;
+        }
+
+        const errors = validator.validate(body);
+
+        if(errors.length > 0) {
+            res.status(400).json({ errors });
+            return;
+        }
+
+        const { content, conversationId, destinatorId, senderId } = body;
+
+        if ((conversationId && destinatorId)) {
+            return res.status(400).send("Invalid payload combination");
+        }
+
+        try {
+            let conversation = null;
+            const sender = await User.findById(senderId);
+            if(!sender) return res.status(400).send("User Sender not found with senderId");
+
+            if(conversationId) {
+                conversation = await Conversation.findById(conversationId);
+            }
+            else {
+                const participants = [senderId, destinatorId];
+
+                conversation = await Conversation.findOneAndUpdate({
+                    participants: {
+                        $all: participants,
+                        $size: 2
+                    }
+                },
+                {
+                    $setOnInsert: {
+                        participants: participants
+                    }
+                },
+                {
+                    upsert: true,
+                    returnDocument: "after"
+                });
+            }
+
+            if (!conversation) return res.status(400).send("Conversation not found");
+
+            let attachmentUrl = undefined; 
+
+            if(file) {
+                attachmentUrl = await Attachments.save(file);
+            }
+
+            const message = await Message.create({
+                content: content,
+                user: senderId,
+                attachmentUrl: attachmentUrl,
+                isEncrypted: false,
+                conversationId: conversation._id
+            });
+
+            await message.populate("user");
+
+            const msgJson = Jsoner.message(message);
+
+            io.to(conversation._id.toString()).emit("message_create", msgJson);
+
+            res.status(200).json(msgJson);
+        }
+        catch(_) {
+            res.status(500).json(JSON_SERVER_ERROR);
         }
     }
-
-    if (!conversation) return res.status(400).send("Conversation not found");
-
-    const message = await Message.create({
-        content: content,
-        user: senderId,
-        isEncrypted: false,
-        conversationId: conversation._id
-    });
-
-    const objMessage = message.toObject();
-    objMessage.user = sender.toObject();
-    delete objMessage.user.password;
-
-    io.to(conversation._id.toString()).emit("message_create", {
-        username: sender.get("username"),
-        content: content,
-        conversationId: conversationId,
-        createdAt: Date.now()
-    });
-
-    res.status(200).send(objMessage);
-});
+);
 
 export default messages;

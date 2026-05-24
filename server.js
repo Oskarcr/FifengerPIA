@@ -1,10 +1,10 @@
 import { app, setEventsToSocket } from "#FifengerServer";
-import mongoose from "mongoose";
+import { connect } from "mongoose";
 import http from "http";
 import { Server as SocketServer } from "socket.io";
 
-const port = parseInt(process.env["SERVER_PORT"]);
-const url = process.env["DATABASE_URL"];
+const PORT = parseInt(process.env["SERVER_PORT"]);
+const DATABASE_URL = process.env["DATABASE_URL"];
 
 const server = http.createServer(app);
 
@@ -19,7 +19,7 @@ app.set("io", io);
 
 async function start() {
     try {
-        await mongoose.connect(url);
+        await connect(DATABASE_URL);
         console.log("Database connected sucessfully");
     }
     catch(err) {
@@ -33,8 +33,8 @@ async function start() {
         setEventsToSocket(socket, io);
     });
 
-    server.listen(port, "0.0.0.0", () => {
-        console.log("App listeting on http://localhost:" + port);
+    server.listen(PORT, "0.0.0.0", () => {
+        console.log("App listeting on http://localhost:" + PORT);
     });
 }
 

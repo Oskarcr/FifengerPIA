@@ -1,7 +1,7 @@
 import { Conversation } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
+import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
 
 const conversations = Router();
 

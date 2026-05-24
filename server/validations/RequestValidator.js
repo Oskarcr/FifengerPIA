@@ -255,6 +255,7 @@ class RequestValidator {
      * }
      */
     empties(body, ...args) {
+        if(!body) return ["No se encontraron datos."];
         const errors = [];
         for(const key of args) {
             const value = body[key];
@@ -268,12 +269,14 @@ class RequestValidator {
     }
 
     /**
-     * Retorna `true` si `body` es un objeto vacio.
-     * @param {any} body 
+     * Retorna `true` si `arg` se encuentra vacio en `body`.
+     * @param {any} body
+     * @param {...(keyof T)} arg  
      */
-    isEmpty(body) {
-        const k = Object.keys(body);
-        return k.length <= 0;
+    getEmptyMessage(body, arg) {
+        const errors = this.empties(body[arg], arg);
+        if(errors.length <= 0) return null;
+        return errors[0];
     }
 }
 

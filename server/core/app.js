@@ -1,6 +1,7 @@
 import express from "express";
 import api from "./api.js";
-import { ATTACHMENTS_DIR } from "#FifengerServer";
+
+const SUPABASE_URL = process.env["SUPABASE_URL"];
 
 const app = express();
 
@@ -16,9 +17,13 @@ app.use(express.json());
 
 app.use("/static", express.static("public"));
 
-app.use("/attachments", express.static(ATTACHMENTS_DIR));
-
 app.use("/api", api);
+
+app.get("/attachments/:fileName", (req, res) => {
+    const { fileName } = req.params;
+    const url = SUPABASE_URL + "/storage/v1/object/public/attachments/" + fileName;
+    res.redirect(url);
+});
 
 app.get("/", (req, res) => res.send("Hello world!"));
 
