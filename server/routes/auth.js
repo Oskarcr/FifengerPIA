@@ -54,7 +54,7 @@ auth.post("/signup", async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "none"
         });
 
@@ -117,7 +117,7 @@ auth.post("/login", async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "none"
         });
 

@@ -4,6 +4,7 @@ import { Router } from "express";
 import { readFileSync } from "fs";
 import { isValidObjectId } from "mongoose";
 import Path from "path";
+import authUser from "../middlewares/authUser.js";
 
 const profile_decorations = JSON.parse(readFileSync(
     Path.join(PROJECT_DIR, "src", "json", "profile_decorations.json"),
@@ -129,6 +130,12 @@ users.get("/:id",
     }
 );
 
-users.post("/logout", )
+users.post("/logout", authUser, async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none"
+    });
+})
 
 export default users;

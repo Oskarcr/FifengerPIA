@@ -2,6 +2,7 @@ import { Conversation } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
 import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
+import authUser from "../middlewares/authUser.js";
 
 const conversations = Router();
 
@@ -58,7 +59,7 @@ conversations.post("/group", async (req, res) => {
     }
 });
 
-conversations.get("/", async (req, res) => {
+conversations.get("/", authUser, async (req, res) => {
     const query = req.query;
 
     if(!query) return res.status(400).send("User not found");
