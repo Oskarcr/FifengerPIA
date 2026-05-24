@@ -1,3 +1,5 @@
+import { User } from "#FifengerModels";
+import { UserStatusEnum } from "#FifengerServer";
 import { Socket } from "socket.io";
 
 // ENVIAR MENSAJES
@@ -12,7 +14,7 @@ const activeUsers = new Map();
  * @param {import("socket.io").Server} io
  */
 export function setEventsToSocket(socket, io) {
-    socket.on("user_connected", (userId) => {
+    socket.on("user_connected", async (userId) => {
             socket.userId = userId
 
             if(!activeUsers.has(userId)){
@@ -21,8 +23,13 @@ export function setEventsToSocket(socket, io) {
 
             activeUsers.get(userId).add(socket.id);
 
+            await User.findByIdAndUpdate(userId, {
+                status: UserStatusEnum.ONLINE
+            });
+
+
             if(activeUsers.get(userId).size === 1){
-                socket.broadcast.emit("user_status_change", {userId, status: "online"});
+                socket.broadcast.emit("user_status_change", {userId, status: UserStatusEnum.ONLINE});
                 console.log(userId + " is online.");
             }
         });
@@ -39,7 +46,7 @@ export function setEventsToSocket(socket, io) {
         // console.log("Socket " + socket.id + " se fue de la sala: " + conversationId)
     });
 
-    socket.on("user_disconnected", () => {
+    socket.on("user_disconnected", async () => {
         const userId = socket.userId;
 
         if(userId && activeUsers.has(userId)){
@@ -49,6 +56,10 @@ export function setEventsToSocket(socket, io) {
 
             if(userSockets.size === 0){
                 activeUsers.delete(userId);
+
+                await User.findByIdAndUpdate(userId, {
+                    status: UserStatusEnum.OFFLINE
+                })
 
                 socket.broadcast.emit("user_status_change", {userId, status: "offline"});
                 console.log(userId + " is now offline.");

@@ -33,6 +33,7 @@ export default function ChatList() {
     
     for(let i = 0; i < conversations.length; i++) {
         const item = conversations[i];
+        let user = null;
         let name = null;
         let photoUrl = null;
         console.log(item);
@@ -41,7 +42,7 @@ export default function ChatList() {
             photoUrl = "fifa.png";
         }
         else {
-            const user = item.participants.find(a => a.username != username);
+            user = item.participants.find(a => a.username != username);
             name = user.username;
             photoUrl = Items.get(user.photoId).url;
         }
@@ -49,13 +50,15 @@ export default function ChatList() {
             name={name} 
             photoSrc={"/rewards/" + photoUrl}
             to={"/chats/" + conversations[i]._id}
+            isOnline={user?.status === 1}
         />);
     }
 
     const searchConversation = async () => {
         const value = searchInputRef.current.value;
         try {
-            const response = await api.get("/(users/search?email=" + value);
+            console.log(value);
+            const response = await api.get("/users/search?email=" + value);
             navigate("temp/" + response.data._id);
             /*const id = response.data[0]._id;
             navigate("/chat/" + id);*/
