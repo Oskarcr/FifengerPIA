@@ -1,12 +1,18 @@
 import { Components, socket } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
 import MENU_OPTIONS from "../json/menu_options.json";
+import axios from "axios";
 
 export default function Menu() {
     const navigate = useNavigate();
 
     const onClicks = {
         "login": () => {
+            async () => {
+                await axios.post("/users/logout", {}, {
+                    withCredentials: true
+                })
+            }
             socket.emit("user_disconnected");
             sessionStorage.clear();
         }

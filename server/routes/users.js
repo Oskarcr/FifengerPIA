@@ -106,4 +106,6 @@ users.get("/:id",
     }
 );
 
+users.post("/logout", )
+
 export default users;
