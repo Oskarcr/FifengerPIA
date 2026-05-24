@@ -78,10 +78,33 @@ users.patch("/buy/:id",
 );
 
 users.patch("/activate/:id", 
+    Middlewares.authUser,
     Middlewares.requireId,
-    (req, res) => {
+    async (req, res) => {
+        console.log("b");
         const { id } = req.params;
-        
+        // @ts-ignore
+        const { id: userId } = req.user;
+        const item = profile_decorations[userId];
+        if(!item) {
+            console.log("nf");
+            res.status(404).json(JSON_NOT_FOUND);
+            return;
+        }
+        try {
+            const query = {};
+            if(item.type === "banner") query.photoId = id;
+            else query.bannerId = id;
+            const user = await User.findByIdAndUpdate(userId, query, {
+                returnDocument: "after"
+            });
+
+            res.status(200).json(Jsoner.user(user));
+        }
+        catch(_) {
+            console.log(_);
+            res.status(500).json(JSON_SERVER_ERROR);
+        }
     }
 );
 

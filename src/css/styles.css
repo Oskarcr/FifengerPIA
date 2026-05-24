@@ -275,6 +275,7 @@ a:not(.chat-option):visited {
 }
 
 .profile-acquisition {
+    cursor: pointer;
     display: inline-block;
     flex-shrink: 0;
     box-sizing: border-box;

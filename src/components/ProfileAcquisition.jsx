@@ -1,5 +1,8 @@
-export default function ProfileAcquisition({src=""}) {
-    return (<div className="profile-acquisition">
+export default function ProfileAcquisition({
+    src="",
+    onClick=undefined
+}) {
+    return (<div onClick={onClick} className="profile-acquisition">
         <img src={src}/>
     </div>);
 }

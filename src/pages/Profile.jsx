@@ -23,11 +23,26 @@ export default function Profile() {
                 const { data: user } = await api.get("/users/" + userId);
                 setUser(user);
             }
-            catch(_) {
-
-            }
+            catch(_) { }
         })();
     }, []);
+
+    const activateItem = async (id) => {
+        const type = Items.get(id).type;
+        setUser((p) => {
+            if(type === "banner") p.bannerId = id;
+            if(type === "picture") p.photoId = id;
+            return p;
+        });
+        try {
+            await api.patch("/users/activate/" + id, {}, {
+                withCredentials: true
+            });
+        }
+        catch(error) {
+            alert(error);
+        }
+    }
 
     const photoUrl = "/rewards/" + Items.get(user.photoId).url;
     const bannerUrl = "/rewards/" + Items.get(user.bannerId).url;
@@ -68,9 +83,12 @@ export default function Profile() {
                         <Components.Icon name="crown"/>
                     </div>
                     <div id="profile-acquisitions-container">
-                        {user.inventory.map((a) => {
-                            const item = Items.get(a);
-                            return <Components.ProfileAcquisition src={"/rewards/" + item.url}/>
+                        {user.inventory.map((id) => {
+                            const item = Items.get(id);
+                            return <Components.ProfileAcquisition
+                                onClick={() => activateItem(id)} 
+                                src={"/rewards/" + item.url}
+                            />
                         })}
                     </div>
                 </div>
