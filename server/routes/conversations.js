@@ -1,14 +1,13 @@
 import { Conversation } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
-import authUser from "../middlewares/authUser.js";
+import { Attachments, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 
 const conversations = Router();
 
 const validator = Validators.conversation;
 
-conversations.post("/group", async (req, res) => {
+conversations.post("/group", Middlewares.authUser, async (req, res) => {
     const { conversationId } = req.body;
     const invalid_group_members = {
         errors: ["El grupo base es invalido."]
@@ -59,7 +58,7 @@ conversations.post("/group", async (req, res) => {
     }
 });
 
-conversations.get("/", authUser, async (req, res) => {
+conversations.get("/", Middlewares.authUser, async (req, res) => {
     const query = req.query;
 
     if(!query) return res.status(400).send("User not found");
@@ -79,7 +78,7 @@ conversations.get("/", authUser, async (req, res) => {
     res.send(conversations);
 });
 
-conversations.get("/:id", async (req, res) => {
+conversations.get("/:id", Middlewares.authUser, async (req, res) => {
     const { id } = req.params;
 
     const conversation = await Conversation.findById(id)
