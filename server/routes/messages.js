@@ -1,11 +1,11 @@
 import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
 import { Server } from "socket.io";
-import { Attachments, JSON_SERVER_ERROR, Jsoner, Validators } from "#FifengerServer";
+import { Attachments, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 const messages = Router();
 const validator = Validators.messages;
 
-messages.get("/:conversationId",async (req, res) => {
+messages.get("/:conversationId", Middlewares.authUser, async (req, res) => {
     const { conversationId } = req.params;
     try {
         const messages = await Message.find({
@@ -19,7 +19,7 @@ messages.get("/:conversationId",async (req, res) => {
     }
 });
 
-messages.post("/", 
+messages.post("/", Middlewares.authUser,
     Attachments.single("attachment"),
     async (req, res) => {
         const file = req.file;
