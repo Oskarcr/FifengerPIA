@@ -1,4 +1,4 @@
-import { api, Components } from "@/FifengerClient";
+import { api, Components, Items } from "@/FifengerClient";
 import { useNavigate } from "react-router-dom";
 import profile_decorations from "../json/profile_decorations.json";
 
@@ -25,21 +25,40 @@ export default function Store() {
                     delete decorations[item];
                 }
                 setPoints(data.points);
-                setItems(Object.values(decorations));
+                setItems(Object.entries(decorations));
             }
             catch(_) {}
         })();
         
     }, []);
 
-    const children = items.map((item) => (
-        <Components.StoreItem 
-            name={item.label} 
-            price={item.points}
-            type={item.type}
-            src={"/rewards/" + item.url}
+    const showErrors = (error) => {
+        alert(error.response.data.errors);
+    }
+
+    const buyItem = async (id) => {
+        const userId = sessionStorage.getItem("id");
+        try {
+            await api.patch("/users/buy/" + id, {
+                userId: userId
+            });
+            window.location.reload();
+        }
+        catch(error) {
+            showErrors(error);
+        }
+    }
+
+    const children = items.map((entry) => {
+        const [id, value] = entry;
+        return <Components.StoreItem 
+            onBuy={() => buyItem(id)}
+            name={value.label} 
+            price={value.points}
+            type={value.type}
+            src={"/rewards/" + value.url}
         />
-    ));
+    });
 
     return (<>
         <div id="header">

@@ -14,8 +14,10 @@ export default function Chat() {
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
     const didFetch = useRef(false);
+    const inputAttachmentRef = useRef(null);
+    const formRef = useRef(null);
 
-    const isTemp = !!destinatorId;
+    const isTemp = Boolean(destinatorId);
 
     useEffect(() => {
         if (!conversationId) return;
@@ -51,10 +53,7 @@ export default function Chat() {
     useEffect(() => {
         const handler = (message) => {
             setMessages((prev) => [{
-                ...message,
-                user: {
-                    username: message.username
-                }
+                ...message
             }, ...prev]);
         };
 
@@ -84,17 +83,17 @@ export default function Chat() {
 
     /**
      * Envia un mensaje al chat.
-     * @param {string} content 
+     * @param {FormData} data 
      */
-    const sendMessage = async (content) => {
+    const sendMessage = async (data) => {
         const senderId = sessionStorage.getItem("id");
+        data.set("senderId", senderId);
+        if(destinatorId) data.set("destinatorId", destinatorId);
+        if(conversationId) data.set("conversationId", conversationId);
+
         try {
-            const response = await api.post("/messages", {
-                senderId: senderId,
-                content: content,
-                destinatorId: destinatorId,
-                conversationId: conversationId
-            });
+            formRef.current.reset();
+            const response = await api.post("/messages", data);
             if(isTemp) navigate("/chat/" + response.data.conversationId);
         }
         catch(error) {
@@ -103,9 +102,8 @@ export default function Chat() {
     }
 
     const onSendMessage = async () => {
-        const content = messageInputRef.current.value;
-        messageInputRef.current.value = "";
-        sendMessage(content);
+        const data = new FormData(formRef.current);
+        sendMessage(data);
     }
 
     const onSendLocation = async () => {
@@ -114,7 +112,9 @@ export default function Chat() {
             alert("No se pudo obtener la ubicacion.");
             return;
         }
-        sendMessage(locationURL);
+        const data = new FormData();
+        data.set("content", locationURL);
+        sendMessage(data);
     }
 
     const onGroupAdd = async () => {
@@ -132,14 +132,13 @@ export default function Chat() {
 
     const children = [];
 
-
     for(let i = 0; i < messages.length; i++) {
-        
         const photoUrl = Items.get(messages[i].user.photoId).url;
         children.push(<Components.Message 
             timestamp={messages[i].createdAt}
             sender={messages[i].user.username}
             content={messages[i].content}
+            attachmentUrl={messages[i].attachmentUrl}
             photoUrl={"/rewards/" + photoUrl}
         />);
     }
@@ -157,7 +156,6 @@ export default function Chat() {
                 </span>
             </Components.Flexed>
             <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
-            <Components.ButtonIcon icon="location_on" onClick={onSendLocation}/>
             <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
         </div>
         <div id="root-content" style={{
@@ -172,21 +170,37 @@ export default function Chat() {
                 {children}
             </section>
 
-            <footer className="chat-input-area">
-                <Components.ButtonIcon icon="add" darkgray/>
+            <form ref={formRef} className="chat-input-area">
+                <Components.ButtonIcon 
+                    icon="add" 
+                    darkgray 
+                    onClick={() => inputAttachmentRef.current.click()}
+                />
+                <Components.ButtonIcon 
+                    icon="location_on" 
+                    darkgray 
+                    onClick={onSendLocation}
+                />
                 <div style={{
                     flex: 1,
                     display: "flex",
                     alignItems: "center"
                 }}>
+                    <input 
+                        ref={inputAttachmentRef}
+                        name="attachment" 
+                        type="file" 
+                        accept="image/*"
+                        style={{display: "none"}}
+                    />
                     <input
-                        ref={messageInputRef}
+                        name="content"
                         type="text"
                         placeholder="Escribe un mensaje futbolero..."
                     />
                 </div>
                 <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
-            </footer>
+            </form>
         </div>
     </>);
 };

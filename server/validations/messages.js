@@ -29,7 +29,7 @@ const messages = new RequestValidator({
         label: "destinator",
         type: String,
         validate: (id) => {
-            if(!isValidObjectId(id)) return "The receiver does not exist."
+            if(!isValidObjectId(id)) return "The receiver is not valid."
         }
     },
     isEncrypted: {
