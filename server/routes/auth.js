@@ -1,7 +1,8 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { Validators } from "#FifengerServer";
+import { UserStatusEnum, Validators } from "#FifengerServer";
 import { User } from "#FifengerModels";
+import jwt from "jsonwebtoken"
 const auth = Router();
 const validator = Validators.user;
 
@@ -39,10 +40,22 @@ auth.post("/signup", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await User.create({
+        const user = await User.create({
             username: username,
             email: email,
             password: hashedPassword
+        });
+
+        const token = jwt.sign({
+            id: user._id,
+            email: user.email,
+            username: user.username,
+        }, process.env.JWT_SECRET);
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "none"
         });
 
         res.status(201).json({
@@ -95,11 +108,28 @@ auth.post("/login", async (req, res) => {
                 message: "Invalid credentials."
             });
         }
-        
+
+        const token = jwt.sign({
+            id: user._id,
+            email: user.email,
+            username: user.username,
+        }, process.env.JWT_SECRET);
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "none"
+        });
+
+        await User.findByIdAndUpdate(user._id, {
+            status: UserStatusEnum.ONLINE
+        });
+
         return res.status(200).json({
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            status: UserStatusEnum.ONLINE
         });
     }
     catch (error) {

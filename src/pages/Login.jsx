@@ -24,6 +24,7 @@ export default function Login() {
             sessionStorage.setItem("username", response.data.username);
             sessionStorage.setItem("email", response.data.email);
             sessionStorage.setItem("id", response.data.id);
+            sessionStorage.setItem("status", response.data.status);
             navigate("/chats");
 
             socket.emit("user_connected", response.data.id);
