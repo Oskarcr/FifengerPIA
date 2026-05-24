@@ -45,7 +45,7 @@ export default function Profile() {
             await api.patch("/users/activate/" + id, {}, {
                 withCredentials: true
             });
-            window.location.reload();
+            //window.location.reload();
         }
         catch(error) {
             showErrors(error);
@@ -63,6 +63,7 @@ export default function Profile() {
             </Components.Flexed>
         </div>
         <div id="root-content" style={{
+            overflow: "auto",
             flex: 1,
             alignItems: "center",
             flexDirection: "column",
