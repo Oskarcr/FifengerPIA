@@ -31,7 +31,6 @@ body {
     --font-size-short: 1.2rem;
     --font-size-medium: 1.5rem;
     --font-size-long: 1.8rem;*/
-
     
     --primary-color-1: rgb(20, 20, 24);
     --primary-color-2: rgb(33, 33, 39);
@@ -45,12 +44,23 @@ body {
     --transition-border: border-color 0.2s ease;
     --spacing-medium: calc(var(--spacing-short) * 1.5);
     --spacing-long: calc(var(--spacing-short) * 2);
+
+    color: var(--secondary-color-2);
 }
 
 /* CSS local */
 
 button {
     color: var(--secondary-color-2);
+    background-color: var(--primary-color-2);
+    border-radius: var(--border-radius);
+    border: var(--border);
+    border-color: var(--secondary-color-1);
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--secondary-color-1);
 }
 
 a:not(.chat-option) {
@@ -207,6 +217,7 @@ a:not(.chat-option):visited {
 }
 
 #profile-container {
+    flex-shrink: 0;
     margin-top: auto;
     margin-bottom: auto;
     width: 100%;

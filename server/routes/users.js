@@ -38,7 +38,6 @@ users.patch("/buy/:id",
         const userId = req.body.userId;
         const id = parseInt(req.params.id + "");
         const item = profile_decorations[(id + "")];
-        console.log(item);
         if(!item) {
             res.status(400).json(JSON_NOT_FOUND);
             return;
@@ -80,30 +79,33 @@ users.patch("/buy/:id",
 
 users.patch("/activate/:id", 
     Middlewares.authUser,
-    Middlewares.requireId,
     async (req, res) => {
-        console.log("b");
-        const { id } = req.params;
+        const id = parseInt(req.params.id);
         // @ts-ignore
         const { id: userId } = req.user;
-        const item = profile_decorations[userId];
+        const item = profile_decorations[id];
         if(!item) {
-            console.log("nf");
             res.status(404).json(JSON_NOT_FOUND);
             return;
         }
         try {
             const query = {};
-            if(item.type === "banner") query.photoId = id;
-            else query.bannerId = id;
-            const user = await User.findByIdAndUpdate(userId, query, {
-                returnDocument: "after"
-            });
+            if(item.type === "banner") query.bannerId = id;
+            else query.photoId = id;
+            const user = await User.findById(userId);
+            
+            if(!user.inventory.includes(id) && id !== 1 && id !== 2) {
+                res.status(400).json({
+                    errors: ["You do not have this item in your inventory."]
+                })
+                return;
+            }
+
+            await user.updateOne(query);
 
             res.status(200).json(Jsoner.user(user));
         }
         catch(_) {
-            console.log(_);
             res.status(500).json(JSON_SERVER_ERROR);
         }
     }

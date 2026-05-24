@@ -23,7 +23,6 @@ const Pages = {
     Profile,
     Signup,
     Store,
-    Test,
     NotFound,
     VideoCall
 };

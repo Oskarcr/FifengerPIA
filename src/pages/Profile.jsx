@@ -1,13 +1,15 @@
 import { api, Components, Items } from "@/FifengerClient";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Profile() {
-    const userId = sessionStorage.getItem("id");
+    const params = useParams();
+    const modificable = !Boolean(params.id);
+    const userId = params.id ? params.id : sessionStorage.getItem("id");
     const navigate = useNavigate();
     const [user, setUser] = useState({
-        username: "Loading...",
-        email: "Loading...",
+        username: undefined,
+        email: undefined,
         photoId: 1,
         bannerId: 2,
         inventory: []
@@ -27,20 +29,26 @@ export default function Profile() {
         })();
     }, []);
 
+    const showErrors = (error) => {
+        alert(error.response.data.errors);
+    }
+
     const activateItem = async (id) => {
+        if(!modificable) return;
         const type = Items.get(id).type;
-        setUser((p) => {
-            if(type === "banner") p.bannerId = id;
-            if(type === "picture") p.photoId = id;
-            return p;
-        });
+        setUser((p) => ({
+            ...p,
+            bannerId: type === "banner" ? id : p.bannerId,
+            photoId: type === "picture" ? id : p.photoId
+        }));
         try {
             await api.patch("/users/activate/" + id, {}, {
                 withCredentials: true
             });
+            window.location.reload();
         }
         catch(error) {
-            alert(error);
+            showErrors(error);
         }
     }
 
@@ -49,15 +57,16 @@ export default function Profile() {
 
     return (<>
         <div id="header">
-            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/menu")}/>
+            <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate(-1)}/>
             <Components.Flexed className="header-title">
                 Perfil
             </Components.Flexed>
         </div>
         <div id="root-content" style={{
+            flex: 1,
             alignItems: "center",
             flexDirection: "column",
-            padding: "var(--spacing-medium)",
+            padding: "var(--spacing-medium)"
         }}>
             <div id="profile-container">
                 <img className="profile-banner" src={bannerUrl}/>
@@ -67,8 +76,8 @@ export default function Profile() {
                         <div id="profile-inputs">
                             <input style={{
                                 fontSize: "var(--font-size-long)"
-                            }} type="text" value={user.username}/>
-                            <input type="email" value={user.email}/>
+                            }} type="text" defaultValue={user.username}/>
+                            <input type="email" defaultValue={user.email}/>
                         </div>
                     </div>
                     <div style={{
@@ -82,6 +91,9 @@ export default function Profile() {
                         Acquisitions &nbsp;&nbsp;&nbsp;&nbsp;
                         <Components.Icon name="crown"/>
                     </div>
+                    {modificable && <button type="button">
+                        Confirmar cambios
+                    </button>}
                     <div id="profile-acquisitions-container">
                         {user.inventory.map((id) => {
                             const item = Items.get(id);

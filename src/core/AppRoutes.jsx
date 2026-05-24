@@ -15,8 +15,9 @@ export default function AppRoutes() {
             <Route path="/store" element= {<Pages.Store/>}/>
             <Route path="/video_call" element={<Pages.VideoCall/>} />
             {/* Cualquier pagina que no sea las de arriba */}
-            <Route path="/test" element= {<Pages.Test/>}/>
-            <Route path="*" element= {<Pages.NotFound/>}/>
+            <Route path="/test" element= {<Pages.Test/>} />
+            <Route path="/profiles/:id" element={<Pages.Profile/>}/>
+            <Route path="*" element= {<Pages.NotFound/>} />
         </Routes>
     </BrowserRouter>);
 }
