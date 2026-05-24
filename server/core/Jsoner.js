@@ -10,6 +10,7 @@ class Jsoner {
 
     static user(a) {
         return {
+            id: a.id,
             username: a.username,
             email: a.email,
             photoId: a.photoId,

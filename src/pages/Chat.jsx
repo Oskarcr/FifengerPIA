@@ -174,6 +174,7 @@ export default function Chat() {
             content={messages[i].content}
             attachmentUrl={messages[i].attachmentUrl}
             photoUrl={"/rewards/" + photoUrl}
+            onClickUsername={() => navigate("/profiles/" + messages[i].user.id)}
         />);
     }
 

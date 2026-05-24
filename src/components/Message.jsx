@@ -1,11 +1,12 @@
 export default function Message({
     sender="", 
     content="", 
+    onClickUsername=undefined,
     attachmentUrl=undefined,
     timestamp = Date.now(),
     photoUrl = undefined,
 }) {
-    
+
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     
     const parts = content.split(urlRegex);
@@ -14,7 +15,7 @@ export default function Message({
         return (urlRegex.test(part) ? 
             (<a key={i} href={part} target="_blank" rel="noreferrer">
                 {part}
-            </a>) : part)
+            </a>) : part);
     });
 
     const date = new Date(timestamp);
@@ -38,14 +39,13 @@ export default function Message({
             minWidth: 0,
         }}>
             <div className="message-info">
-                <span className="message-sender">{sender}</span>
+                <span className="message-sender" onClick={onClickUsername}>{sender}</span>
                 <span className="message-time">{time}</span>
             </div>
             <p className="message-content">{contentArry}</p>
             { attachmentUrl && <img style={{
                 marginTop: "var(--spacing-medium)",
                 width: "min(100%, 512px)",
-
                 display: "block",
                 objectFit: "contain"
             }} src={"/attachments/" + attachmentUrl}/>}
