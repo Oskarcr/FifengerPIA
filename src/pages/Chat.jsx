@@ -2,17 +2,12 @@ import { Components, Items, api, getLocationURL, socket } from "@/FifengerClient
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import CryptoJS from "crypto-js"; // <-- 1. IMPORTAMOS LA LIBRERÍA
-
 // @ts-ignore
 import "../css/Chat.css";
 
-// <-- 2. DEFINIMOS UNA CLAVE SECRETA (Debe ser la misma para Óscar y para ti)
-const SECRET_KEY = "ClaveSecretaMiddleware123";
 
 export default function Chat() {
     const delay = 0.15 * 1000;
-    /**@type {import("react").RefObject<HTMLInputElement>} */
-    const messageInputRef = useRef(null);
     const { destinatorId, conversationId } = useParams();
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
@@ -23,11 +18,8 @@ export default function Chat() {
 
     const isTemp = Boolean(destinatorId);
 
-    // Función auxiliar para desencriptar de forma segura sin romper la app si el texto no está cifrado
-   const decryptMessage = (cipherText) => {
-        // !!! AQUÍ MERITO VA LA LÍNEA !!!
-        console.log("Mensaje original encriptado desde la BD o Socket:", cipherText);
-
+    /*
+    const decryptMessage = (cipherText) => {
         try {
             const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
             const decrypted = bytes.toString(CryptoJS.enc.Utf8);
@@ -36,6 +28,7 @@ export default function Chat() {
             return cipherText;
         }
     };
+    */
 
     useEffect(() => {
         if (!conversationId) return;
@@ -67,15 +60,11 @@ export default function Chat() {
         }, delay);
     });
 
-    // <-- 3. DESENCRIPTAR AL RECIBIR MENSAJES EN TIEMPO REAL (SOCKETS)
     useEffect(() => {
         const handler = (message) => {
             setMessages((prev) => [{
                 ...message,
-                content: decryptMessage(message.content), // Desencriptamos el contenido que llega
-                user: {
-                    username: message.username
-                }
+                content: message.content,//decryptMessage(message.content), 
             }, ...prev]);
         };
 
@@ -86,7 +75,6 @@ export default function Chat() {
         };
     }, []);
 
-    // <-- 4. DESENCRIPTAR AL CARGAR EL HISTORIAL (API GET)
     useEffect(() => {
         if(didFetch.current || !conversationId) return;
         didFetch.current = true;
@@ -95,9 +83,9 @@ export default function Chat() {
                 api.get("messages/" + conversationId)
                 .then(res => {
                     // Mapeamos los mensajes que vienen de la base de datos y los desencriptamos todos
-                    const decryptedMessages = res.data.map(msg => ({
-                        ...msg,
-                        content: decryptMessage(msg.content)
+                    const decryptedMessages = res.data.map(message => ({
+                        ...message,
+                        //content: decryptMessage(msg.content)
                     }));
                     setMessages(decryptedMessages);
                 });
@@ -116,8 +104,8 @@ export default function Chat() {
      */
     const sendMessage = async (data) => {
         if(data.has("content")) {
-            const encryptedContent = CryptoJS.AES.encrypt(data.get("content", SECRET_KEY).toString();
-            data.set("content", encryptedContent);
+            //const encryptedContent = CryptoJS.AES.encrypt(data.get("content"), SECRET_KEY).toString();
+            //data.set("content", encryptedContent);
         }
         const senderId = sessionStorage.getItem("id");
         data.set("senderId", senderId);
@@ -168,7 +156,6 @@ export default function Chat() {
     for(let i = 0; i < messages.length; i++) {
         const photoUrl = Items.get(messages[i].user.photoId).url;
         children.push(<Components.Message 
-            key={messages[i].id || i} // Buena práctica añadir una key en React
             timestamp={messages[i].createdAt}
             sender={messages[i].user.username}
             content={messages[i].content}
