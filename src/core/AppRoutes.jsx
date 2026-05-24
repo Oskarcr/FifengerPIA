@@ -4,7 +4,10 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 export default function AppRoutes() {
     return (<BrowserRouter>
         <Routes>
-            <Route path="/" element= {<Pages.Login/>}/>
+            {/* 🛠️ TRUCO: Cambiamos el Login por la lista de chats en la raíz */}
+            <Route path="/" element= {<Pages.ChatList/>}/>
+            
+            {/* Todas tus demás rutas se quedan exactamente igual */}
             <Route path="/chats/temp/:destinatorId" element={<Pages.Chat/>}/>
             <Route path="/chats" element= {<Pages.ChatList/>}/>
             <Route path="/chats/:conversationId" element={<Pages.Chat/>}/>

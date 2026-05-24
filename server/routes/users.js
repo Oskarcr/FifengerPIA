@@ -4,7 +4,6 @@ import { Router } from "express";
 import { readFileSync } from "fs";
 import { isValidObjectId } from "mongoose";
 import Path from "path";
-import authUser from "../middlewares/authUser.js";
 
 const profile_decorations = JSON.parse(readFileSync(
     Path.join(PROJECT_DIR, "src", "json", "profile_decorations.json"),
@@ -13,7 +12,7 @@ const profile_decorations = JSON.parse(readFileSync(
 
 const users = Router();
 
-users.get("/search", async (req, res) => {
+users.get("/search", Middlewares.authUser, async (req, res) => {
     try {
         const query = req.query;
         delete query.password;
@@ -112,6 +111,7 @@ users.patch("/activate/:id",
 );
 
 users.get("/:id", 
+    Middlewares.authUser,
     Middlewares.requireId,
     async (req, res) => {
         const { id } = req.params;
@@ -132,12 +132,14 @@ users.get("/:id",
     }
 );
 
-users.post("/logout", authUser, async (req, res) => {
+users.post("/logout", Middlewares.authUser, (req, res) => {
+    console.log("Galleta cerrada.");
     res.clearCookie("token", {
         httpOnly: true,
         secure: true,
         sameSite: "none"
     });
-})
+    res.status(200).json({ message: "Successfully closed session."});
+});
 
 export default users;
