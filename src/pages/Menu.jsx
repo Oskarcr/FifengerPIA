@@ -7,13 +7,14 @@ export default function Menu() {
 
     const onClicks = {
         "login": async () => {
-                try{
-                    await api.post("/users/logout");
-                }
-                catch(error) {
-                    console.log(error);
-                }
-            socket.emit("user_disconnected");
+            try{
+                await api.post("/users/logout");
+            }
+            catch(error) {
+                console.log(error);
+            }
+
+            socket.emit("logout");
             sessionStorage.clear();
             navigate("/login");
         }

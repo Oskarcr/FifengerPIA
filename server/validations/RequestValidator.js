@@ -274,7 +274,8 @@ class RequestValidator {
      * @param {...(keyof T)} arg  
      */
     getEmptyMessage(body, arg) {
-        const errors = this.empties(body[arg], arg);
+        // @ts-ignore
+        const errors = this.empties(body, arg);
         if(errors.length <= 0) return null;
         return errors[0];
     }

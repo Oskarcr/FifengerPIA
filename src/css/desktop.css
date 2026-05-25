@@ -67,3 +67,13 @@ body {
 .item-card > img {
     height: 360px;
 }
+
+#call-video-container {
+    width: 100%;
+    max-width: 1280px;
+    flex-direction: row;
+}
+
+.call-video {
+    width: calc(50% - var(--spacing-medium) / 2);
+}
