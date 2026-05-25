@@ -151,9 +151,7 @@ export default function VideoCall() {
         };
     }, [conversationId]);
 
-    const onEndCall = () => {
-
-    }
+    const onEndCall = () => navigate(-1);
 
     const onSwitchMicro = () => {
         setMuted((prevMuted) => {
