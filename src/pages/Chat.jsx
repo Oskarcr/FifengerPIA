@@ -193,7 +193,11 @@ export default function Chat() {
                 onClick={() => navigate("/call/" + conversationId)}
             />}
             <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
+            
+            {/* 📋 BOTÓN PARA IR AL PANEL DE TAREAS (REQUISITO 4) */}
+            <Components.ButtonIcon icon="assignment" onClick={() => navigate(`/chats/${conversationId}/tasks`)}/>
         </div>
+        
         <div id="root-content" style={{
             flex: 1,
             position: "relative",
@@ -233,11 +237,11 @@ export default function Chat() {
                         name="content"
                         type="text"
                         placeholder="Escribe un mensaje futbolero..."
-                        onKeyDown={(e) => e.key === 'Enter' && onSendMessage()} // Para enviar con Enter directo
+                        onKeyDown={(e) => e.key === 'Enter' && onSendMessage()}
                     />
                 </div>
                 <Components.ButtonIcon onClick={onSendMessage} icon="send" darkgray/>
             </form>
         </div>
     </>);
-};
+}

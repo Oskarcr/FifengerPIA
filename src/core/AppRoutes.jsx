@@ -1,6 +1,8 @@
 import Pages from "./Pages.jsx";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
+import GroupTasks from "../pages/GroupTasks.jsx";
+
 export default function AppRoutes() {
     return (<BrowserRouter>
         <Routes>
@@ -11,6 +13,7 @@ export default function AppRoutes() {
             <Route path="/chats/:conversationId" element={<Pages.Chat/>}/>
             <Route path="/login" element= {<Pages.Login/>}/>
             <Route path="/menu" element= {<Pages.Menu/>}/>
+            <Route path="/chats/:conversationId/tasks" element={<GroupTasks />} />
             <Route path="/profile" element= {<Pages.Profile/>}/>
             <Route path="/signup" element= {<Pages.Signup/>}/>
             <Route path="/store" element= {<Pages.Store/>}/>
