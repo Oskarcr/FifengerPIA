@@ -20,7 +20,12 @@ const UserSchema = new Schema({
         required: true,
         default: 0
     },
+    lastPointsAt: Date,
     inventory: [Number]
+});
+
+UserSchema.index({
+    status: 1
 });
 
 const User = model("User", UserSchema);

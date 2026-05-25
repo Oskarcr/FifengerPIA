@@ -3,13 +3,13 @@ class UserStatusEnum {
      * El usuario que esta inactivo en ese momento.
      * @readonly
      */
-    OFFLINE = 0;
+    OFFLINE = 1;
 
     /**
      * Es un usuario que esta activo en ese momento. 
      * @readonly
      */
-    ONLINE = 1;
+    ONLINE = 2;
 
     _map = {
         "offline": this.OFFLINE,
@@ -17,8 +17,8 @@ class UserStatusEnum {
     };
 };
 
-const userStatus = new UserStatusEnum();
+const UserStatus = new UserStatusEnum();
 
-Object.freeze(userStatus);
+Object.freeze(UserStatus);
 
-export default userStatus;
+export default UserStatus;

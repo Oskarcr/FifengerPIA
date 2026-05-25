@@ -1,7 +1,7 @@
 import { Conversation, User } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
+import { Attachments, JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 
 const conversations = Router();
 
@@ -86,15 +86,9 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
             participants: participantsList
         });
 
-        const conversationR = await Conversation
-            .findById(conversation._id)
-            .populate("participants");
+        await conversation.populate("participants");
 
-        console.log(emailNormalized);
-        console.log(id);
-        console.log(name);
-
-        return res.status(200).json(Jsoner.conversation(conversationR));
+        res.status(200).json(Jsoner.conversation(conversation));
     }
     catch(_) {
         res.status(500).json(JSON_SERVER_ERROR);
@@ -102,125 +96,169 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
 });
 
 
-conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.requireId, async (req, res) => {
-    const { id } = req.params;
-    const { email } = req.body;
+conversations.patch("/:id/add-participant", 
+    Middlewares.authUser, 
+    Middlewares.requireId, 
+    async (req, res) => {
+        const { id } = req.params;
+        const { email } = req.body;
 
-    const emailNormalized = email.trim().toLowerCase();
+        const emailNormalized = email.trim().toLowerCase();
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const validEmail = emailRegex.test(emailNormalized);
-    
-    if(!validEmail) return res.status(400).json({
-        message: "Invalid email."
-    })
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const validEmail = emailRegex.test(emailNormalized);
 
-    /*
-    const { body } = validator.parseBody(req.body);
-
-    const empties = validator.empties(body, "email");
-
-    if(empties.length > 0) {
-        res.status(400).json({
-            empties
+        if(!validEmail) return res.status(400).json({
+            errors: ["Invalid email."]
         });
-        return;
-    }
 
-    const errors = validator.validate(body);
+        try {
 
-    if(errors.length > 0){
-        res.status(400).json({
-            errors
-        });
-        return;
-    }
-    */
-
-    try {
-
-        console.log(emailNormalized);
-        console.log(id);
-        const userToAdd = await User.findOne({
-            email: emailNormalized
-        });
-        
-        if (!userToAdd) {
-            return res.status(404).json({ message: "The user with that email does not exist." });
-        }
-        console.log("Paso si el usuario se encontro");
-
-        const conversation = await Conversation.findById(id);
-        if (!conversation) {
-            return res.status(404).json({ message: "Conversation not found." });
-        }
-        console.log("Paso si existe la conversacion");
-
-        if (!conversation.isGroup) {
-            return res.status(400).json({
-                message: "Cannot add participants to a private conversation."
+            console.log(emailNormalized);
+            console.log(id);
+            const userToAdd = await User.findOne({
+                email: emailNormalized
             });
+
+            if (!userToAdd) {
+                return res.status(404).json({ message: "The user with that email does not exist." });
+            }
+            console.log("Paso si el usuario se encontro");
+
+            const conversation = await Conversation.findById(id);
+            if (!conversation) {
+                return res.status(404).json({ message: "Conversation not found." });
+            }
+            console.log("Paso si existe la conversacion");
+
+            if (!conversation.isGroup) {
+                return res.status(400).json({
+                    message: "Cannot add participants to a private conversation."
+                });
+            }
+
+            const alreadyExists = conversation.participants.some(pId => pId.equals(userToAdd._id));
+            console.log(alreadyExists);
+            console.log(conversation.participants);
+            console.log(userToAdd._id.toString());
+            if(alreadyExists){
+                return res.status(400).json({
+                    message: "The user is already a member of this group."
+                })
+            }
+            console.log("Paso si ya existe el usuario");
+
+            conversation.participants.push(userToAdd._id);
+            await conversation.save();
+
+            const updatedConversation = await Conversation.findById(id).populate("participants");
+
+            console.log("Paso al 200");
+            return res.status(200).json(Jsoner.conversation(updatedConversation));
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json(JSON_SERVER_ERROR);
         }
-
-        const alreadyExists = conversation.participants.some(pId => pId.equals(userToAdd._id));
-        console.log(alreadyExists);
-        console.log(conversation.participants);
-        console.log(userToAdd._id.toString());
-        if(alreadyExists){
-            return res.status(400).json({
-                message: "The user is already a member of this group."
-            })
-        }
-        console.log("Paso si ya existe el usuario");
-
-        conversation.participants.push(userToAdd._id);
-        await conversation.save();
-
-        const updatedConversation = await Conversation.findById(id).populate("participants");
-
-        console.log("Paso al 200");
-        return res.status(200).json(Jsoner.conversation(updatedConversation));
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json(JSON_SERVER_ERROR);
     }
-});
+);
 
-conversations.get("/", Middlewares.authUser, async (req, res) => {
-    const query = req.query;
+conversations.patch("/:id/switch_encryption", 
+    Middlewares.authUser,
+    Middlewares.requireId,
+    async (req, res) => {
+        // @ts-ignore
+        const userId = req.user.id + "";
+        const id = req.params.id + "";
 
-    if(!query) return res.status(400).send("User not found");
+        try {
+            const conversation = await Conversation.findById(id);
+            if(!conversation) {
+                res.status(404).json(JSON_NOT_FOUND);
+                return;
+            }
+            const participants = conversation.participants;
+            const belongs = participants.some(id => id.equals(userId));
+            if(!belongs) {
+                res.status(401).json({
+                    errors: ["You don't belong in this conversation."]
+                });
+                return;
+            }
 
-    const userId = query.userId + "";
+            const currentEncryptionEnabled = conversation.get("encryptionEnabled");
+            conversation.set({
+                encryptionEnabled: !currentEncryptionEnabled
+            });
+            await conversation.save();
 
-    if(!isValidObjectId(userId)) return res.status(400).json({
-        message: "Invalid user ID."
-    });
-    
-    const conversations = await Conversation.find({
-        participants: {
-            $in: [new Types.ObjectId(userId)]
+            res.status(200).json(Jsoner.conversation(conversation));
         }
-    }).populate("participants");
-    
-    res.send(conversations);
-});
-
-conversations.get("/:id", Middlewares.authUser, async (req, res) => {
-    const { id } = req.params;
-
-    const conversation = await Conversation.findById(id)
-    .populate("participants", "username");
-
-    if (!conversation) {
-        return res.status(404).send("Conversation not found");
+        catch(_) {
+            res.status(200).json(JSON_SERVER_ERROR);
+            return;
+        }
     }
+);
 
-    /*if (!conversation.participants.some(p => p.toString() === userId)) {
-        return res.status(403).send("Unauthorized action");
-    }*/
+conversations.get("/", 
+    Middlewares.authUser, 
+    async (req, res) => {
+        const query = req.query;
 
-    res.json(conversation);
-});
+        if(!query) return res.status(400).send("User not found");
+
+        const userId = query.userId + "";
+
+        if(!isValidObjectId(userId)) return res.status(400).json({
+            message: "Invalid user ID."
+        });
+        try {
+            const conversations = await Conversation.find({
+                participants: {
+                    $in: [new Types.ObjectId(userId)]
+                }
+            }).populate("participants");
+            
+            const data = conversations.map(Jsoner.conversation);
+            res.status(200).json(data);
+        }
+        catch(_) {
+            res.status(500).json(JSON_SERVER_ERROR);
+        }
+    }
+);
+
+conversations.get("/:id", 
+    Middlewares.authUser, 
+    async (req, res) => {
+        // @ts-ignore
+        const userId = req.user.id + "";
+        const { id } = req.params;
+
+        if(!isValidObjectId(id)) {
+            res.status(404).send(JSON_NOT_FOUND);
+            return;
+        }
+
+        const conversation = await Conversation.findById(id)
+        .populate("participants");
+
+        if (!conversation) {
+            res.status(404).json(JSON_NOT_FOUND);
+            return;
+        }
+
+        const participants = conversation.participants;
+        const belongs = participants.some(id => id.equals(userId));
+        if(!belongs) {
+            res.status(401).json({
+                errors: ["You don't belong in this conversation."]
+            });
+            return;
+        }
+
+        res.status(200).json(Jsoner.conversation(conversation));
+    }
+);
 
 export default conversations;

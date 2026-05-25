@@ -26,7 +26,7 @@ export default function Login() {
             sessionStorage.setItem("status", response.data.status);
             navigate("/chats");
 
-            socket.emit("user_connected", response.data.id);
+            socket.emit("login", response.data.id);
         }
         catch (error) {
             console.log(error);
