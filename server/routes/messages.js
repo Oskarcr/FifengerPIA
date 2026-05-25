@@ -7,8 +7,6 @@ const messages = Router();
 const validator = Validators.messages;
 
 const transporter = nodemailer.createTransport({
-    host: process.env["SMTP_HOST"],
-    port: Number(process.env["SMTP_PORT"]),
     service: "gmail",
     auth: {
         user: process.env["SMTP_USER"],
@@ -32,10 +30,8 @@ messages.get("/:conversationId", Middlewares.authUser, async (req, res) => {
 
 messages.post("/send-email", Middlewares.authUser, async (req, res) => {
     const { conversationId, content } = req.body;
-    const { id } = req.user;
-    const senderId = id;
+    const senderId = req.user.id;
 
-    console.log("Entrando al try");
     try {
 
         const conversation = await Conversation.findById(conversationId)
@@ -47,9 +43,18 @@ messages.post("/send-email", Middlewares.authUser, async (req, res) => {
             });
         }
 
+        if (conversation.isGroup) {
+            return res.status(400).json({
+                error: "Email notifications are not supported for group chats yet."
+            });
+        }
+
         const receiver = conversation.participants.find(
-            user => user._id.toString() !== senderId
-        );
+            user => {const participantId = user.id.toString() || user._id.toString();
+            return participantId !== senderId
+        });
+
+        console.log("INTENTANDO ENVIAR CORREO A:", receiver ? receiver.email : "Nadie encontrado");
 
         if (!receiver || !receiver.email) {
             return res.status(404).json({
@@ -58,7 +63,7 @@ messages.post("/send-email", Middlewares.authUser, async (req, res) => {
         }
 
         const mailOptions = {
-            from: '"Fifenger App" <no-reply@fifenger.com>',
+            from: "Fifenger App " + "<" + process.env["SMTP_USER"] + ">",
             to: receiver.email,
             subject: 'You have a new external message from Fifenger', 
             text: content,
@@ -68,17 +73,6 @@ messages.post("/send-email", Middlewares.authUser, async (req, res) => {
                    `</blockquote>
                    <p>Log in to the platform to respond.</p>`
         };
-
-        transporter.verify((error) => {
-            if(error){
-                console.log(error);
-            }
-            else{
-                console.log("Conecto!");
-            }
-        });
-
-        await transporter.verify();
 
         await transporter.sendMail(mailOptions);
 
