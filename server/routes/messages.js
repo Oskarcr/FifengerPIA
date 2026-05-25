@@ -2,8 +2,19 @@ import { Conversation, Message, User } from "#FifengerModels";
 import { Router } from "express";
 import { Server } from "socket.io";
 import { Attachments, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
+import nodemailer from "nodemailer";
 const messages = Router();
 const validator = Validators.messages;
+
+const transporter = nodemailer.createTransport({
+    host: process.env["SMTP_HOST"],
+    port: Number(process.env["SMTP_PORT"]),
+    service: "gmail",
+    auth: {
+        user: process.env["SMTP_USER"],
+        pass: process.env["SMTP_PASS"]
+    }
+});
 
 messages.get("/:conversationId", Middlewares.authUser, async (req, res) => {
     const { conversationId } = req.params;
@@ -16,6 +27,66 @@ messages.get("/:conversationId", Middlewares.authUser, async (req, res) => {
     }
     catch(_) {
         res.status(500).json(JSON_SERVER_ERROR);
+    }
+});
+
+messages.post("/send-email", Middlewares.authUser, async (req, res) => {
+    const { conversationId, content } = req.body;
+    const { id } = req.user;
+    const senderId = id;
+
+    console.log("Entrando al try");
+    try {
+
+        const conversation = await Conversation.findById(conversationId)
+            .populate("participants");
+
+        if (!conversation) {
+            return res.status(404).json({
+                error: "Conversation not found."
+            });
+        }
+
+        const receiver = conversation.participants.find(
+            user => user._id.toString() !== senderId
+        );
+
+        if (!receiver || !receiver.email) {
+            return res.status(404).json({
+                error: "Recipient user does not have email."
+            });
+        }
+
+        const mailOptions = {
+            from: '"Fifenger App" <no-reply@fifenger.com>',
+            to: receiver.email,
+            subject: 'You have a new external message from Fifenger', 
+            text: content,
+            html: `<p>A system user has sent you the following message:</p>
+                   <blockquote style="background: #f9f9f9; padding: 10px; border-left: 5px solid #ccc;">`
+                     + content +
+                   `</blockquote>
+                   <p>Log in to the platform to respond.</p>`
+        };
+
+        transporter.verify((error) => {
+            if(error){
+                console.log(error);
+            }
+            else{
+                console.log("Conecto!");
+            }
+        });
+
+        await transporter.verify();
+
+        await transporter.sendMail(mailOptions);
+
+        return res.status(200).json({ message: "Email sent correctly." });
+
+    } catch (error) {
+        console.error("Error en SMTP:", error);
+        return res.status(500).json({ error: "There was an error processing the SMTP submission." });
     }
 });
 

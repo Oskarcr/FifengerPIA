@@ -10,16 +10,20 @@ export default function Chat() {
     const delay = 0.15 * 1000;
     const { destinatorId, conversationId } = useParams();
     const [label, setLabel] = useState("Loading...");
-    const [isGroup, setIsGroup] = useState(false);
     const [messages, setMessages] = useState([]);
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
+    const [placeholderOne, setPlaceholderOne] = useState("");
+    const [placeholderTwo, setPlaceholderTwo] = useState("");
+    const [isGroup, setIsGroup] = useState(false);
     const [showMessageBox , setShowMessageBox] = useState(false);
     const [showInputBox, setShowInputBox] = useState(false);
+    const [doubleField, setDoubleField] = useState(false);
     const navigate = useNavigate();
     const didFetch = useRef(false);
     const inputAttachmentRef = useRef(null);
     const formRef = useRef(null);
+    const [confirmAction, setConfirmAction] = useState(() => () => {});
 
     const isTemp = Boolean(destinatorId);
 
@@ -133,6 +137,48 @@ export default function Chat() {
         sendMessage(data);
     }
 
+    const onSendMail = async () => {
+        setTitle("Send Mail");
+        setDoubleField(false);
+        setPlaceholderOne("Your message");
+        setConfirmAction(() => (content) => sendMail(content));
+        setShowInputBox(true);
+    }
+
+    const sendMail = async (content) => {
+        if(!content || !content.trim()){
+            setShowInputBox(false);
+            setTitle("Error");
+            setMessage("The content cannot be empty.")
+            setShowMessageBox(true);
+            return;
+        }
+
+        try{
+            await api.post("/messages/send-email", {
+                conversationId: conversationId,
+                content: content
+            })
+
+            setShowInputBox(false);
+            setTitle("Success");
+            setMessage("The mail message has been sent successfully.");
+            setShowMessageBox(true);
+        }
+        catch (error) {
+            console.log(error);
+
+            setShowInputBox(false);
+
+            setTitle("Error");
+
+            const backendError = error.response?.data?.error || "Error sending email.";
+            setMessage(backendError);
+
+            setShowMessageBox(true);
+        }
+    }
+
     const onSendLocation = async () => {
         const locationURL = await getLocationURL();
         if(!locationURL) {
@@ -146,6 +192,10 @@ export default function Chat() {
 
     const onGroupAdd = async () => {
         setTitle("Add");
+        setDoubleField(true);
+        setPlaceholderOne("User email");
+        setPlaceholderTwo("Group name");
+        setConfirmAction(() => (email, groupName) => addUser(email, groupName));
         setShowInputBox(true);
     }
 
@@ -207,8 +257,9 @@ export default function Chat() {
         )}
 
         {showInputBox && (
-            <Components.InputBox doubleField title={title} onClose={() => setShowInputBox(false)}
-            onConfirm={(email, groupName) => addUser(email, groupName)} placeholderOne="User email" placeholderTwo="Group name">
+            <Components.InputBox doubleField={doubleField} title={title} onClose={() => setShowInputBox(false)}
+                    onConfirm={confirmAction}
+            placeholderOne={placeholderOne} placeholderTwo={placeholderTwo}>
             </Components.InputBox>
         )}
 
@@ -222,7 +273,8 @@ export default function Chat() {
                 }}>
                 </span>
             </Components.Flexed>
-            <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
+            <Components.ButtonIcon icon="forward_to_inbox" onClick={onSendMail}/>
+            <Components.ButtonIcon icon="call" onClick={() => navigate("/video_call")}/>
             <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
         </div>
         <div id="root-content" style={{
