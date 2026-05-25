@@ -1,12 +1,17 @@
 import { User } from "#FifengerModels";
-import { UserStatusEnum } from "#FifengerServer";
+import { UserStatus } from "#FifengerServer";
 import { Socket } from "socket.io";
 
-// ENVIAR MENSAJES
-// RECIBIR MENSAJES
-// {userId: "sdidsjijsd", content: "Hola"} 
-
+/**
+ * @type {Map<string, string>}
+ */
 const activeUsers = new Map();
+
+/**
+ * Es un map... `Map<conversationId, userIds[]>`.
+ * @type {Map<string, Set<string>>}
+ */
+const callcitas = new Map();
 
 /**
  * Establece los eventos de socket a un socket.
@@ -14,57 +19,141 @@ const activeUsers = new Map();
  * @param {import("socket.io").Server} io
  */
 export function setEventsToSocket(socket, io) {
-    socket.on("user_connected", async (userId) => {
-            socket.userId = userId
+    /**@type {string} */
+    let conversationId = null;
+    /**@type {string} */
+    let userId = null;
 
-            if(!activeUsers.has(userId)){
-                activeUsers.set(userId, new Set());
-            }
+    /**
+     * Emite un evento a todos los demas en la sala `conversationId`.
+     * @param {string} eventName 
+     * @param {any} data 
+     */
+    const emitOnCall = (eventName, data) => {
+        if(!conversationId) return;
+        const people = callcitas.get(conversationId);
+        if (!people) return;
 
-            activeUsers.get(userId).add(socket.id);
+        for (const id of people) {
+            if (id === userId) continue;
+            const socketId = activeUsers.get(id);
+            if (!socketId) continue;
+            io.to(socketId).emit(eventName, data);
+        }
+    }
 
+    const leaveCall = () => {
+        if(!userId) return;
+        if (!conversationId) return;
+
+        const people = callcitas.get(conversationId);
+        if (!people) return;
+
+        people.delete(userId);
+        
+        if (people.size <= 0) callcitas.delete(conversationId);
+        
+        socket.leave(conversationId);
+        conversationId = null;
+        
+        console.log("leaved to call: " + userId);
+    }
+
+    const disconnect = async () => {
+        if(!userId) return;
+
+        try {
             await User.findByIdAndUpdate(userId, {
-                status: UserStatusEnum.ONLINE
+                status: UserStatus.OFFLINE
             });
-
-
-            if(activeUsers.get(userId).size === 1){
-                socket.broadcast.emit("user_status_change", {userId, status: UserStatusEnum.ONLINE});
-                console.log(userId + " is online.");
-            }
+        }
+        catch(_) {}
+        
+        activeUsers.delete(userId);
+        socket.broadcast.emit("user_status_change", {
+            userId: userId, 
+            status: "offline"
         });
+        
+        console.log(userId + " is now offline.");
+
+        leaveCall();
+
+        userId = null;
+        conversationId = null;
+    }
+
+    socket.on("login", async (id) => {
+        userId = id;
+        
+        activeUsers.set(userId, socket.id);
+
+        try {
+            await User.findByIdAndUpdate(userId, {
+                status: UserStatus.ONLINE
+            });
+        }
+        catch(_) {}
+
+        socket.broadcast.emit("user_status_change", {
+            userId: userId, 
+            status: UserStatus.ONLINE
+        });
+
+        console.log(userId + " is online.");
+    });
+
+    socket.on("join_call", (data) => {
+        if(!userId) return;
+        if(!data.conversationId) return;
+        conversationId = data.conversationId;
+
+        let people = callcitas.get(conversationId);
+
+        if (!people) {
+            people = new Set();
+            callcitas.set(conversationId, people);
+        }
+
+        people.add(userId);
+        socket.join(conversationId);
+
+        console.log("joined to call: " + userId);
+
+        if (people.size === 2) {
+            socket.to(conversationId).emit("call_created"); 
+        }
+    });
+
+    socket.on("leave_call", leaveCall);
+
+    socket.on("rtc_offer", (data) => {
+        emitOnCall("rtc_offer", data);
+    });
+
+    socket.on("rtc_answer", (data) => {
+        emitOnCall("rtc_answer", data);
+    });
+
+    socket.on("ice_candidate", (data) => {
+        emitOnCall("ice_candidate", data);
+    });
     
     socket.on("join_conversation", (data) => {
-        const { conversationId } = data;
-        if(!conversationId) return;
+        if(!userId) return;
+        if(!data.conversationId) return;
+        conversationId = data.conversationId;
         socket.join(conversationId);
     });
 
-    socket.on("leave_conversation", ({ conversationId }) => {
+    socket.on("leave_conversation", () => {
+        if(!userId) return;
         if (!conversationId) return;
         socket.leave(conversationId);
-        // console.log("Socket " + socket.id + " se fue de la sala: " + conversationId)
+        conversationId = null;
     });
 
-    socket.on("user_disconnected", async () => {
-        const userId = socket.userId;
+    socket.on("logout", disconnect);
 
-        if(userId && activeUsers.has(userId)){
-            const userSockets = activeUsers.get(userId);
-
-            userSockets.delete(socket.id);
-
-            if(userSockets.size === 0){
-                activeUsers.delete(userId);
-
-                await User.findByIdAndUpdate(userId, {
-                    status: UserStatusEnum.OFFLINE
-                })
-
-                socket.broadcast.emit("user_status_change", {userId, status: "offline"});
-                console.log(userId + " is now offline.");
-            }
-        }
-        // console.log("User disconnected:", socket.id);
-    });
+    socket.on("disconnect", disconnect);
 }

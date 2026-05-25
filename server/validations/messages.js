@@ -5,17 +5,10 @@ const messages = new RequestValidator({
     content: {
         label: "content",
         type: String,
+        normalize: (a) => a.trim(),
         validate: (text) => {
-            if (text.length < 1) return "The message cannot be empty."
-
-            if(text.length > 2000) return "The message cannot exceed 2000 characters."
-        }
-    },
-    senderId: {
-        label: "sender",
-        type: String,
-        validate: (id) => {
-            if(!isValidObjectId(id)) return "Sender account is invalid."
+            if (text.length < 1) return "The message cannot be empty.";
+            if(text.length > 2000) return "The message cannot exceed 2000 characters.";
         }
     },
     conversationId: {
@@ -29,12 +22,8 @@ const messages = new RequestValidator({
         label: "destinator",
         type: String,
         validate: (id) => {
-            if(!isValidObjectId(id)) return "The receiver is not valid."
+            if(!isValidObjectId(id)) return "The receiver is not valid.";
         }
-    },
-    isEncrypted: {
-        label: "encripted",
-        type: Boolean
     }
 });
 

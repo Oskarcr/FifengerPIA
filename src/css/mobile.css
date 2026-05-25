@@ -61,3 +61,13 @@ body {
 .item-card > img {
     height: 300px;
 }
+
+#call-video-container {
+    width: 100%;
+    max-width: 420px;
+    flex-direction: column;
+}
+
+.call-video {
+    width: 100%;
+}

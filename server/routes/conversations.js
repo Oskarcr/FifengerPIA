@@ -1,7 +1,7 @@
 import { Conversation } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { Attachments, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
+import { Attachments, JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 
 const conversations = Router();
 
@@ -47,52 +47,112 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
             participants: base.participants
         });
 
-        const conversationR = await Conversation
-            .findById(conversation._id)
-            .populate("participants");
+        await conversation.populate("participants");
 
-        return Jsoner.conversation(conversationR);
+        res.status(200).json(Jsoner.conversation(conversation));
     }
     catch(_) {
         res.status(500).json(JSON_SERVER_ERROR);
     }
 });
 
-conversations.get("/", Middlewares.authUser, async (req, res) => {
-    const query = req.query;
+conversations.patch("/:id/switch_encryption", 
+    Middlewares.authUser,
+    Middlewares.requireId,
+    async (req, res) => {
+        // @ts-ignore
+        const userId = req.user.id + "";
+        const id = req.params.id + "";
 
-    if(!query) return res.status(400).send("User not found");
+        try {
+            const conversation = await Conversation.findById(id);
+            if(!conversation) {
+                res.status(404).json(JSON_NOT_FOUND);
+                return;
+            }
+            const participants = conversation.participants;
+            const belongs = participants.some(id => id.equals(userId));
+            if(!belongs) {
+                res.status(401).json({
+                    errors: ["You don't belong in this conversation."]
+                });
+                return;
+            }
 
-    const userId = query.userId + "";
+            const currentEncryptionEnabled = conversation.get("encryptionEnabled");
+            conversation.set({
+                encryptionEnabled: !currentEncryptionEnabled
+            });
+            await conversation.save();
 
-    if(!isValidObjectId(userId)) return res.status(400).json({
-        message: "Invalid user ID."
-    });
-    
-    const conversations = await Conversation.find({
-        participants: {
-            $in: [new Types.ObjectId(userId)]
+            res.status(200).json(Jsoner.conversation(conversation));
         }
-    }).populate("participants");
-    
-    res.send(conversations);
-});
-
-conversations.get("/:id", Middlewares.authUser, async (req, res) => {
-    const { id } = req.params;
-
-    const conversation = await Conversation.findById(id)
-    .populate("participants", "username");
-
-    if (!conversation) {
-        return res.status(404).send("Conversation not found");
+        catch(_) {
+            res.status(200).json(JSON_SERVER_ERROR);
+            return;
+        }
     }
+);
 
-    /*if (!conversation.participants.some(p => p.toString() === userId)) {
-        return res.status(403).send("Unauthorized action");
-    }*/
+conversations.get("/", 
+    Middlewares.authUser, 
+    async (req, res) => {
+        const query = req.query;
 
-    res.json(conversation);
-});
+        if(!query) return res.status(400).send("User not found");
+
+        const userId = query.userId + "";
+
+        if(!isValidObjectId(userId)) return res.status(400).json({
+            message: "Invalid user ID."
+        });
+        try {
+            const conversations = await Conversation.find({
+                participants: {
+                    $in: [new Types.ObjectId(userId)]
+                }
+            }).populate("participants");
+            
+            const data = conversations.map(Jsoner.conversation);
+            res.status(200).json(data);
+        }
+        catch(_) {
+            res.status(500).json(JSON_SERVER_ERROR);
+        }
+    }
+);
+
+conversations.get("/:id", 
+    Middlewares.authUser, 
+    async (req, res) => {
+        // @ts-ignore
+        const userId = req.user.id + "";
+        const { id } = req.params;
+
+        if(!isValidObjectId(id)) {
+            res.status(404).send(JSON_NOT_FOUND);
+            return;
+        }
+
+        const conversation = await Conversation.findById(id)
+        .populate("participants");
+
+        if (!conversation) {
+            res.status(404).json(JSON_NOT_FOUND);
+            return;
+        }
+
+        const participants = conversation.participants;
+        const belongs = participants.some(id => id.equals(userId));
+        if(!belongs) {
+            res.status(401).json({
+                errors: ["You don't belong in this conversation."]
+            });
+            return;
+        }
+
+        res.status(200).json(Jsoner.conversation(conversation));
+    }
+);
 
 export default conversations;
