@@ -177,7 +177,7 @@ export default function Chat() {
                 id: conversationId,
                 email: email
             });
-            navigate("/chats/" + group.id);
+            navigate("/chats");
         }
         catch(error) {
             console.log(error.message);
