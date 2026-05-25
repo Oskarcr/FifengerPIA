@@ -43,19 +43,15 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
 
     const { name } = body;
 
-    console.log(emailNormalized);
-    console.log(id);
-    console.log(name);
-
     try {
-        const base = await Conversation.findById(id);
+        const conversationBase = await Conversation.findById(id);
 
-        if(!base) {
+        if(!conversationBase) {
             res.status(400).json(invalid_group_members);
             return;
         }
 
-        let participantsList = [...base.participants];
+        let participantsList = [...conversationBase.participants];
 
         if(emailNormalized){
             const userToAdd = await User.findOne({ email: emailNormalized });
@@ -68,6 +64,20 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
             if(!participantsList.some(pId => pId.equals(userToAdd._id))){
                 participantsList.push(userToAdd._id);
             }
+        }
+
+        const conversationExists = await Conversation.findOne({
+            isGroup: true,
+            name: name,
+            participants: { $all: participantsList, $size: participantsList.length}
+        });
+
+        if (conversationExists) {
+            return res.status(200).json(
+                Jsoner.conversation(
+                    await conversationExists.populate("participants")
+                )
+            );
         }
 
         const conversation = await Conversation.create({
@@ -91,6 +101,7 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
     }
 });
 
+
 conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.requireId, async (req, res) => {
     const { id } = req.params;
     const { email } = req.body;
@@ -103,8 +114,6 @@ conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.re
     if(!validEmail) return res.status(400).json({
         message: "Invalid email."
     })
-
-    
 
     /*
     const { body } = validator.parseBody(req.body);
@@ -129,6 +138,9 @@ conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.re
     */
 
     try {
+
+        console.log(emailNormalized);
+        console.log(id);
         const userToAdd = await User.findOne({
             email: emailNormalized
         });
@@ -136,28 +148,37 @@ conversations.patch("/:id/add-participant", Middlewares.authUser, Middlewares.re
         if (!userToAdd) {
             return res.status(404).json({ message: "The user with that email does not exist." });
         }
+        console.log("Paso si el usuario se encontro");
 
         const conversation = await Conversation.findById(id);
         if (!conversation) {
             return res.status(404).json({ message: "Conversation not found." });
         }
+        console.log("Paso si existe la conversacion");
 
-        if (conversation.participants.includes(userToAdd._id)) {
-            return res.status(400).json({ message: "The user is already a member of this group." });
+        if (!conversation.isGroup) {
+            return res.status(400).json({
+                message: "Cannot add participants to a private conversation."
+            });
         }
 
         const alreadyExists = conversation.participants.some(pId => pId.equals(userToAdd._id));
+        console.log(alreadyExists);
+        console.log(conversation.participants);
+        console.log(userToAdd._id.toString());
         if(alreadyExists){
             return res.status(400).json({
                 message: "The user is already a member of this group."
             })
         }
+        console.log("Paso si ya existe el usuario");
 
         conversation.participants.push(userToAdd._id);
         await conversation.save();
 
         const updatedConversation = await Conversation.findById(id).populate("participants");
 
+        console.log("Paso al 200");
         return res.status(200).json(Jsoner.conversation(updatedConversation));
     } catch (error) {
         console.error(error);

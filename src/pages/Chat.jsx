@@ -10,6 +10,7 @@ export default function Chat() {
     const delay = 0.15 * 1000;
     const { destinatorId, conversationId } = useParams();
     const [label, setLabel] = useState("Loading...");
+    const [isGroup, setIsGroup] = useState(false);
     const [messages, setMessages] = useState([]);
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
@@ -56,6 +57,7 @@ export default function Chat() {
             else {
                 api.get("conversations/" + conversationId).then((response) => {
                     const item = response.data;
+                    setIsGroup(item.isGroup);
                     const name = item.isGroup ? item.name : item.participants.find(a => a.username != username)?.username;
                     setLabel(name);
                 });
@@ -158,6 +160,17 @@ export default function Chat() {
             }
 
             console.log(groupName);
+
+            if(conversationId && isGroup) {
+                const { data: updatedGroup } = await api.patch("/conversations/" + conversationId + "/add-participant", {
+                    email: email
+                });
+
+                setShowInputBox(false);
+                console.log("usuario agregado");
+                window.location.reload();
+                return;
+            }
 
             const { data: group } = await api.post("/conversations/group", {
                 name: groupName ? groupName : "Grupito",
