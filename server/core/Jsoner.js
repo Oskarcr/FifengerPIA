@@ -2,15 +2,17 @@ class Jsoner {
 
     static conversation(a) {
         return {
+            id: a._id,
             name: a.name,
-            id: a.id,
+            encryptionEnabled: a.encryptionEnabled, 
+            isGroup: a.isGroup,
             participants: a.participants.map(Jsoner.user)
         };
     }
 
     static user(a) {
         return {
-            id: a.id,
+            id: a._id,
             username: a.username,
             email: a.email,
             photoId: a.photoId,

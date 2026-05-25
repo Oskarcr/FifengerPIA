@@ -1,16 +1,16 @@
-import { Components, Items, api, getLocationURL, socket } from "@/FifengerClient";
+import { Components, Items, api, getLocationURL, preventDefault, socket } from "@/FifengerClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import CryptoJS from "crypto-js"; // <-- 1. IMPORTAMOS LA LIBRERÍA
 // @ts-ignore
 import "../css/Chat.css";
 
-
 export default function Chat() {
-    const delay = 0.15 * 1000;
     const { destinatorId, conversationId } = useParams();
+    const delay = 0.15 * 1000;
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
+    const [cryptoIcon, setCryptoIcon] = useState("encrypted_off");
+    const [isGroup, setIsGroup] = useState(false);
     const navigate = useNavigate();
     const didFetch = useRef(false);
     const inputAttachmentRef = useRef(null);
@@ -35,6 +35,10 @@ export default function Chat() {
         socket.emit("join_conversation", {
             conversationId: conversationId
         });
+
+        return (() => {
+            socket.emit("leave_conversation");
+        })
     }, [conversationId]);
 
     useEffect(() => {
@@ -62,10 +66,10 @@ export default function Chat() {
 
     useEffect(() => {
         const handler = (message) => {
-            setMessages((prev) => [{
-                ...message,
-                content: message.content,//decryptMessage(message.content), 
-            }, ...prev]);
+            setMessages((prev) => [
+                message,
+                ...prev,
+            ]);
         };
 
         socket.on("message_create", handler);
@@ -78,19 +82,20 @@ export default function Chat() {
     useEffect(() => {
         if(didFetch.current || !conversationId) return;
         didFetch.current = true;
+        const userId = sessionStorage.getItem("id");
         (async () => {
             try {
-                api.get("messages/" + conversationId)
-                .then(res => {
-                    // Mapeamos los mensajes que vienen de la base de datos y los desencriptamos todos
-                    const decryptedMessages = res.data.map(message => ({
-                        ...message,
-                        //content: decryptMessage(msg.content)
-                    }));
-                    setMessages(decryptedMessages);
+                const { data } = await api.get("/conversations/" + conversationId, {
+                    withCredentials: true
                 });
+                setCryptoIcon(data.encryptionEnabled  ? "encrypted" : "encrypted_off");
+                setIsGroup(data.isGroup);
+                api.get("/messages/" + conversationId)
+                .then(response => setMessages(response.data));
             }
-            catch(_) {}
+            catch(error) {
+                showErrors(error);
+            }
         })();
     }, []);
 
@@ -103,10 +108,6 @@ export default function Chat() {
      * @param {FormData} data 
      */
     const sendMessage = async (data) => {
-        if(data.has("content")) {
-            //const encryptedContent = CryptoJS.AES.encrypt(data.get("content"), SECRET_KEY).toString();
-            //data.set("content", encryptedContent);
-        }
         const senderId = sessionStorage.getItem("id");
         data.set("senderId", senderId);
         if(destinatorId) data.set("destinatorId", destinatorId);
@@ -151,6 +152,21 @@ export default function Chat() {
         }
     }
 
+    const onSwitchEncryption = async () => {
+        try {
+            const url = "/conversations/" + conversationId + "/switch_encryption";
+            const { data } = await api.patch(url, {}, {
+                withCredentials: true
+            });
+            const isEnabled = data.encryptionEnabled;
+            setCryptoIcon(isEnabled ? "encrypted" : "encrypted_off");
+            alert("Encryption " + (isEnabled ? "enabled" : "disabled"));
+        }
+        catch(error) {
+            showErrors(error);
+        }
+    }
+
     const children = [];
 
     for(let i = 0; i < messages.length; i++) {
@@ -170,13 +186,12 @@ export default function Chat() {
             <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chats")} />
             <Components.Flexed className="header-title">
                 {label}
-                <span style={{
-                    marginLeft: "var(--spacing-medium)",
-                    fontSize: "var(--font-size-short)"
-                }}>
-                </span>
             </Components.Flexed>
-            <Components.ButtonIcon icon="call"  onClick={() => navigate("/video_call")}/>
+            <Components.ButtonIcon icon={cryptoIcon}  onClick={onSwitchEncryption}/>
+            {(!isGroup && isGroup !== null) && <Components.ButtonIcon 
+                icon="call"
+                onClick={() => navigate("/call/" + conversationId)}
+            />}
             <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
         </div>
         <div id="root-content" style={{
@@ -191,7 +206,7 @@ export default function Chat() {
                 {children}
             </section>
 
-            <form ref={formRef} className="chat-input-area">
+            <form ref={formRef} className="chat-input-area" onSubmit={preventDefault}>
                 <Components.ButtonIcon 
                     icon="add" 
                     darkgray 
@@ -217,7 +232,7 @@ export default function Chat() {
                     <input
                         name="content"
                         type="text"
-                        placeholder="Escribe un mensaje encriptado..."
+                        placeholder="Escribe un mensaje futbolero..."
                         onKeyDown={(e) => e.key === 'Enter' && onSendMessage()} // Para enviar con Enter directo
                     />
                 </div>

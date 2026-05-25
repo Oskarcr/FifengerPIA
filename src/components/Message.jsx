@@ -15,7 +15,7 @@ export default function Message({
         return (urlRegex.test(part) ? 
             (<a key={i} href={part} target="_blank" rel="noreferrer">
                 {part}
-            </a>) : part);
+            </a>) : <p> {part} </p>);
     });
 
     const date = new Date(timestamp);
@@ -42,7 +42,7 @@ export default function Message({
                 <span className="message-sender" onClick={onClickUsername}>{sender}</span>
                 <span className="message-time">{time}</span>
             </div>
-            <p className="message-content">{contentArry}</p>
+            <div className="message-content">{contentArry}</div>
             { attachmentUrl && <img style={{
                 marginTop: "var(--spacing-medium)",
                 width: "min(100%, 512px)",

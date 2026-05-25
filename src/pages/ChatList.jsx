@@ -1,4 +1,4 @@
-import { api, Components, Items } from "@/FifengerClient";
+import { api, Components, Items, socket } from "@/FifengerClient";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MessageBox from "../components/MessageBox.jsx";
@@ -21,13 +21,42 @@ export default function ChatList() {
     const didFetch = useRef(false);
 
     useEffect(() => {
+        const onUserStatusChange = (data) => {
+            const { userId, status } = data;
+            console.log(data);
+            setConversations(prev => {
+                return prev.map(conversation => {
+                    if (conversation.isGroup) return conversation;
+                    console.log(conversation);
+                    return {
+                        ...conversation,
+                        participants: conversation.participants.map(user => {
+                            if (user.id === userId) return {
+                                ...user,
+                                status
+                            };
+                            return user;
+                        })
+                    };
+                });
+            });
+        };
+
+        socket.on("user_status_change", onUserStatusChange);
+    
+        return () => {
+            socket.off("user_status_change", onUserStatusChange);
+        };
+    }, []);
+
+    useEffect(() => {
         if(didFetch.current) return;
         didFetch.current = true;
+    
         (async () => {
             const userId = sessionStorage.getItem("id");
-            api.get("/conversations?userId=" + userId).then((response) => {
-                setConversations(response.data);
-            });
+            const { data } = await api.get("/conversations?userId=" + userId);
+            setConversations(data);
         })();
     }, []);
     
@@ -36,7 +65,6 @@ export default function ChatList() {
         let user = null;
         let name = null;
         let photoUrl = null;
-        console.log(item);
         if(item.isGroup) {
             name = item.name;
             photoUrl = "fifa.png";
@@ -49,31 +77,20 @@ export default function ChatList() {
         children.push(<Components.ChatOption 
             name={name} 
             photoSrc={"/rewards/" + photoUrl}
-            to={"/chats/" + conversations[i]._id}
-            isOnline={user?.status === 1}
+            to={"/chats/" + conversations[i].id}
+            isOnline={user?.status === 2}
         />);
     }
 
     const searchConversation = async () => {
         const value = searchInputRef.current.value;
         try {
-            console.log(value);
             const response = await api.get("/users/search?email=" + value);
-            navigate("temp/" + response.data._id);
+            navigate("/temp/" + response.data._id);
             /*const id = response.data[0]._id;
             navigate("/chat/" + id);*/
         }
-        catch(error) {
-            console.log(error);
-
-            const data = error.response.data;
-
-            setTitle("Error");
-
-            setMessage(data);
-
-            setShowMessage(true);
-        }
+        catch(error) { }
     }
 
     return (

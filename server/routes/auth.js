@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { UserStatusEnum, Validators } from "#FifengerServer";
+import { Jsoner, Validators } from "#FifengerServer";
 import { User } from "#FifengerModels";
 import jwt from "jsonwebtoken"
 const auth = Router();
@@ -121,16 +121,7 @@ auth.post("/login", async (req, res) => {
             sameSite: "none"
         });
 
-        await User.findByIdAndUpdate(user._id, {
-            status: UserStatusEnum.ONLINE
-        });
-
-        return res.status(200).json({
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            status: UserStatusEnum.ONLINE
-        });
+        return res.status(200).json(Jsoner.user(user));
     }
     catch (error) {
         console.log(error);

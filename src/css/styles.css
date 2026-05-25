@@ -64,6 +64,7 @@ button:hover {
 }
 
 a:not(.chat-option) {
+    display: inline;
     overflow-wrap: break-word;
     text-decoration: underline;
     color: rgb(112, 23, 255);
@@ -71,6 +72,10 @@ a:not(.chat-option) {
 
 a:not(.chat-option):visited {
     color: rgb(116, 90, 169)
+}
+
+p {
+    display: inline;
 }
 
 #header {
@@ -181,9 +186,22 @@ a:not(.chat-option):visited {
 }
 
 .header-title {
+    display: flex;
+    align-items: center;
+    /*cursor: pointer;*/
+    flex: 1;
+    height: 100%;
+    overflow-x: hidden;
     font-size: var(--font-size-medium);
-    margin-left: var(--spacing-short);
+    padding-left: var(--spacing-short);
+    box-sizing: border-box;
 }
+
+/*
+.header-title:hover {
+    background-color: var(--primary-color-2);
+}
+*/
 
 .menu-option {
     display: flex;
@@ -543,4 +561,22 @@ input:focus {
 
 .input-box-field{
     font-size: 1.1rem;
+}
+
+#call-video-container {
+    display: flex;
+    gap: var(--spacing-medium);
+    padding: var(--spacing-medium);
+    box-sizing: border-box;
+}
+
+.call-video {
+    aspect-ratio: 3 / 2;
+    border: var(--border);
+    border-color: var(--secondary-color-1);
+    box-sizing: border-box;
+    background-color: #000;
+    border-radius: var(--border-radius);
+    object-fit: cover;
+    transform: scaleX(-1); 
 }
