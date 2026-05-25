@@ -9,12 +9,22 @@ export default function Chat() {
     const delay = 0.15 * 1000;
     const [label, setLabel] = useState("Loading...");
     const [messages, setMessages] = useState([]);
+    // el ricardo
+    const [title, setTitle] = useState("");
+    const [message, setMessage] = useState("");
+    const [placeholderOne, setPlaceholderOne] = useState("");
+    const [placeholderTwo, setPlaceholderTwo] = useState("");
+    const [showMessageBox , setShowMessageBox] = useState(false);
+    const [showInputBox, setShowInputBox] = useState(false);
+    const [doubleField, setDoubleField] = useState(false);
+    // yo merito pe
     const [cryptoIcon, setCryptoIcon] = useState("encrypted_off");
     const [isGroup, setIsGroup] = useState(false);
     const navigate = useNavigate();
     const didFetch = useRef(false);
     const inputAttachmentRef = useRef(null);
     const formRef = useRef(null);
+    const [confirmAction, setConfirmAction] = useState(() => () => {});
 
     const isTemp = Boolean(destinatorId);
 
@@ -56,6 +66,7 @@ export default function Chat() {
             else {
                 api.get("conversations/" + conversationId).then((response) => {
                     const item = response.data;
+                    setIsGroup(item.isGroup);
                     const name = item.isGroup ? item.name : item.participants.find(a => a.username != username)?.username;
                     setLabel(name);
                 });
@@ -128,6 +139,48 @@ export default function Chat() {
         sendMessage(data);
     }
 
+    const onSendMail = async () => {
+        setTitle("Send Mail");
+        setDoubleField(false);
+        setPlaceholderOne("Your message");
+        setConfirmAction(() => (content) => sendMail(content));
+        setShowInputBox(true);
+    }
+
+    const sendMail = async (content) => {
+        if(!content || !content.trim()){
+            setShowInputBox(false);
+            setTitle("Error");
+            setMessage("The content cannot be empty.")
+            setShowMessageBox(true);
+            return;
+        }
+
+        try{
+            await api.post("/messages/send-email", {
+                conversationId: conversationId,
+                content: content
+            })
+
+            setShowInputBox(false);
+            setTitle("Success");
+            setMessage("The mail message has been sent successfully.");
+            setShowMessageBox(true);
+        }
+        catch (error) {
+            console.log(error);
+
+            setShowInputBox(false);
+
+            setTitle("Error");
+
+            const backendError = error.response?.data?.error || "Error sending email.";
+            setMessage(backendError);
+
+            setShowMessageBox(true);
+        }
+    }
+
     const onSendLocation = async () => {
         const locationURL = await getLocationURL();
         if(!locationURL) {
@@ -140,14 +193,47 @@ export default function Chat() {
     }
 
     const onGroupAdd = async () => {
+        setTitle("Add");
+        setDoubleField(true);
+        setPlaceholderOne("User email");
+        setPlaceholderTwo("Group name");
+        setConfirmAction(() => (email, groupName) => addUser(email, groupName));
+        setShowInputBox(true);
+    }
+
+    const addUser = async (email, groupName) => {
         try {
+            if(!email.trim()){
+                setTitle("Error");
+                setMessage("Enter a valid email.");
+                setShowInputBox(false);
+                setShowMessageBox(true);
+                return;
+            }
+
+            console.log(groupName);
+
+            if(conversationId && isGroup) {
+                const { data: updatedGroup } = await api.patch("/conversations/" + conversationId + "/add-participant", {
+                    email: email
+                });
+
+                setShowInputBox(false);
+                console.log("usuario agregado");
+                window.location.reload();
+                return;
+            }
+
             const { data: group } = await api.post("/conversations/group", {
-                name : "Grupito",
-                conversationId: conversationId
+                name: groupName ? groupName : "Grupito",
+                id: conversationId,
+                email: email
             });
-            navigate("/chats/" + group.id);
+            navigate("/chats");
         }
         catch(error) {
+            console.log(error.message);
+
             showErrors(error);
         }
     }
@@ -181,12 +267,25 @@ export default function Chat() {
         />);
     }
 
-    return (<>
+    return (
+    <>
+        {showMessageBox && (
+            <Components.MessageBox title={title} content={message} onConfirm={() => setShowMessageBox(false)}/>
+        )}
+
+        {showInputBox && (
+            <Components.InputBox doubleField={doubleField} title={title} onClose={() => setShowInputBox(false)}
+                    onConfirm={confirmAction}
+            placeholderOne={placeholderOne} placeholderTwo={placeholderTwo}>
+            </Components.InputBox>
+        )}
+
         <div id="header">
             <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/chats")} />
             <Components.Flexed className="header-title">
                 {label}
             </Components.Flexed>
+            <Components.ButtonIcon icon="forward_to_inbox" onClick={onSendMail}/>
             <Components.ButtonIcon icon={cryptoIcon}  onClick={onSwitchEncryption}/>
             {(!isGroup && isGroup !== null) && <Components.ButtonIcon 
                 icon="call"

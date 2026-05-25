@@ -1,9 +1,11 @@
 import { User } from "#FifengerModels";
-import { JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares, PROJECT_DIR } from "#FifengerServer";
+import { JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares, PROJECT_DIR, Validators } from "#FifengerServer";
 import { Router } from "express";
 import { readFileSync } from "fs";
 import { isValidObjectId } from "mongoose";
 import Path from "path";
+
+const validator = Validators.user;
 
 const profile_decorations = JSON.parse(readFileSync(
     Path.join(PROJECT_DIR, "src", "json", "profile_decorations.json"),
@@ -131,6 +133,56 @@ users.get("/:id",
         res.json(Jsoner.user(user));
     }
 );
+
+users.patch("/me", Middlewares.authUser, async (req,res) => {
+    const { email: currentEmail, username: currentUsername, id: id } = req.user;
+
+    const body = validator.parseBody(req.body);
+
+    const { username, email } = body;
+
+    const empties = validator.empties(body, "username", "email")
+    
+    if(empties.length > 0){
+        res.status(400).json({
+            empties
+        });
+        return;
+    }
+
+    const errors = validator.validate(body)
+
+    if(errors.length > 0){
+        res.status(400).json({
+            errors
+        });
+        return;
+    }
+
+    try{
+        const user = await User.findByIdAndUpdate( id , {
+            username: username,
+            email: email
+        },
+        {returnDocument: "after"}
+    );
+
+        if(!user){
+            res.status(400).json({
+                message: "User not found."
+            });
+            return;
+        }
+        console.log(currentEmail + " " + currentUsername);
+
+        return res.status(200).json(Jsoner.user(user));
+    }
+    catch(error){
+        console.log(error);
+
+        return res.status(500).json(JSON_SERVER_ERROR);
+    }
+});
 
 users.post("/logout", Middlewares.authUser, (req, res) => {
     console.log("Galleta cerrada.");

@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useRef, useState } from "react";
-import { api } from "@/FifengerClient";
-import MessageBox from "../components/MessageBox.jsx";
+import { api, Components } from "@/FifengerClient";
 
 export default function Signup() {
     const navigate = useNavigate();
@@ -47,7 +46,7 @@ export default function Signup() {
     return (
         <>
             {showMessage && (
-                <MessageBox title={title} content={message} onConfirm={() => {
+                <Components.MessageBox title={title} content={message} onConfirm={() => {
                     setShowMessage(false);
                 }}/>
             )}

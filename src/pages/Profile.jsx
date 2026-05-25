@@ -14,6 +14,13 @@ export default function Profile() {
         bannerId: 2,
         inventory: []
     });
+
+    const [editUsername, setEditUsername] = useState("");
+    const [editEmail, setEditEmail] = useState("");
+    const [title, setTitle] = useState("");
+    const [message, setMessage] = useState("");
+    const [showMessageBox, setShowMessageBox] = useState(false);
+
     const didFetch = useRef(false);
 
     useEffect(() => {
@@ -24,6 +31,9 @@ export default function Profile() {
             try {
                 const { data: user } = await api.get("/users/" + userId);
                 setUser(user);
+
+                setEditUsername(user.username || "");
+                setEditEmail(user.email || "");
             }
             catch(_) { }
         })();
@@ -52,10 +62,55 @@ export default function Profile() {
         }
     }
 
+    const modifyData = async () => {
+        if(!modificable) return;
+
+        try{
+            await api.patch("/users/me", {
+                email: editEmail,
+                username: editUsername
+            });
+
+            sessionStorage.setItem("username", editUsername);
+            setTitle("Success");
+            setMessage("Successfully modified user.");
+            setShowMessageBox(true);
+        }
+        catch(error){
+            console.log(error);
+
+            const data = error.response.data;
+
+            setTitle("Error");
+
+            if (data.message) {
+                setMessage(data.message);
+            }
+
+            if(data.empties) {
+                setMessage(data.empties.join("\\n"));
+            }
+
+            if(data.errors){
+                setMessage("The fields are missing:\\n" + data.errors.join("\\n"));
+            }
+
+            setShowMessageBox(true);
+        }
+    }
+
     const photoUrl = "/rewards/" + Items.get(user.photoId).url;
     const bannerUrl = "/rewards/" + Items.get(user.bannerId).url;
 
-    return (<>
+    return (
+    <>
+        {showMessageBox && (
+            <Components.MessageBox title={title} content={message} onConfirm={() => {
+                setShowMessageBox(false)
+                window.location.reload();
+            }}/>
+        )}
+
         <div id="header">
             <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate(-1)}/>
             <Components.Flexed className="header-title">
@@ -77,8 +132,8 @@ export default function Profile() {
                         <div id="profile-inputs">
                             <input style={{
                                 fontSize: "var(--font-size-long)"
-                            }} type="text" defaultValue={user.username}/>
-                            <input type="email" defaultValue={user.email}/>
+                            }} type="text" value={editUsername} onChange={(e) => setEditUsername(e.target.value)}/>
+                            <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)}/>
                         </div>
                     </div>
                     <div style={{
@@ -92,7 +147,7 @@ export default function Profile() {
                         Acquisitions &nbsp;&nbsp;&nbsp;&nbsp;
                         <Components.Icon name="crown"/>
                     </div>
-                    {modificable && <button type="button">
+                    {modificable && <button type="button" onClick={modifyData}>
                         Confirmar cambios
                     </button>}
                     <div id="profile-acquisitions-container">

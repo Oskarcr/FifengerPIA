@@ -1,7 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
-import { api, socket } from "@/FifengerClient";
-import MessageBox from "../components/MessageBox.jsx";
+import { api, Components, socket } from "@/FifengerClient";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -54,7 +53,7 @@ export default function Login() {
     return (
         <>
             {showMessage && (
-                <MessageBox title={title} content={message} onConfirm={() => {
+                <Components.MessageBox title={title} content={message} onConfirm={() => {
                     setShowMessage(false)
                 }}/>
             )}
