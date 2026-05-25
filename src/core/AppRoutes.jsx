@@ -1,10 +1,12 @@
 import Pages from "./Pages.jsx";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
+import GroupTasks from "../pages/GroupTasks.jsx";
+
 export default function AppRoutes() {
     return (<BrowserRouter>
         <Routes>
-            {/* 🛠️ TRUCO: Cambiamos el Login por la lista de chats en la raíz */}
+            {/* TRUCO: Cambiamos el Login por la lista de chats en la raíz */}
             <Route path="/" element= {<Pages.ChatList/>}/>
             
             {/* Todas tus demás rutas se quedan exactamente igual */}
@@ -13,6 +15,7 @@ export default function AppRoutes() {
             <Route path="/chats/:conversationId" element={<Pages.Chat/>}/>
             <Route path="/login" element= {<Pages.Login/>}/>
             <Route path="/menu" element= {<Pages.Menu/>}/>
+            <Route path="/chats/:conversationId/tasks" element={<GroupTasks />} />
             <Route path="/profile" element= {<Pages.Profile/>}/>
             <Route path="/signup" element= {<Pages.Signup/>}/>
             <Route path="/store" element= {<Pages.Store/>}/>
