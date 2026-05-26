@@ -85,11 +85,13 @@ export default function ChatList() {
         const value = searchInputRef.current.value;
         try {
             const response = await api.get("/users/search?email=" + value);
-            navigate("/temp/" + response.data._id);
-            /*const id = response.data[0]._id;
-            navigate("/chat/" + id);*/
+            navigate("/chats/temp/" + response.data.id);
         }
-        catch(error) { }
+        catch(error) {
+            setTitle("Alert")
+            setMessage("User not found");
+            setShowMessage(true);
+        }
     }
 
     return (

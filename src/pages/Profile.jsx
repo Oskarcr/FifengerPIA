@@ -40,7 +40,9 @@ export default function Profile() {
     }, []);
 
     const showErrors = (error) => {
-        alert(error.response.data.errors);
+        setTitle("Success");
+        setMessage(error.response.data.errors);
+        setShowMessageBox(true);
     }
 
     const activateItem = async (id) => {

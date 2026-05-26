@@ -1,4 +1,11 @@
 class Jsoner {
+    static task(a, i) {
+        return {
+            id: i,
+            title: a.title,
+            completed: a.completed
+        };
+    }
 
     static conversation(a) {
         return {

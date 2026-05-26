@@ -1,7 +1,7 @@
 import { Conversation, User } from "#FifengerModels";
 import { Router } from "express";
 import { isValidObjectId, Types } from "mongoose";
-import { Attachments, JSON_NOT_FOUND, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
+import { Attachments, JSON_NOT_FOUND, JSON_OK, JSON_SERVER_ERROR, Jsoner, Middlewares, Validators } from "#FifengerServer";
 
 const conversations = Router();
 
@@ -95,6 +95,157 @@ conversations.post("/group", Middlewares.authUser, async (req, res) => {
     }
 });
 
+/**
+ * @param {string} userId
+ * @param {string} id
+ * @returns {Promise<[Object, boolean]>}
+ */
+async function inConversation(id, userId) {
+    try {
+        const conversation = await Conversation.findById(id)
+        .populate("participants");
+
+        if (!conversation) [conversation, false];
+
+        const participants = conversation.participants;
+        const belongs = participants.some(id => id.equals(userId));
+        if(!belongs) return [conversation, false];
+        return [conversation, true];
+    }
+    catch (_) {
+        return [null, false]
+    }
+}
+
+conversations.patch("/:id/tasks/complete",
+    Middlewares.authUser,
+    Middlewares.requireId,
+    async (req, res) => {
+        try {
+            const id = req.params.id + "";
+            // @ts-ignore
+            const userId = req.user.id + "";
+            const [conversation, belongs] = await inConversation(id, userId);
+
+            if (!belongs) {
+                res.status(401).json({
+                    errors: ["You don't belong in this conversation."]
+                });
+                return;
+            }
+
+            if (!conversation.isGroup) {
+                res.status(400).json(["Direct messages cannot be marked as completed task groups."]);
+                return;
+            }
+
+            const taskIdStr = req.body.taskId + "";
+
+            const taskId = parseInt(taskIdStr);
+            if(isNaN(taskId) || taskId < 0){
+                res.status(400).json({
+                    errors: ["The taskId must be a valid positive number index."]
+                });
+                return;
+            }
+
+            /**@type {{completed: boolean, title: string}[]} */
+            const tasks = conversation.tasks;
+            if(taskId >= tasks.length || taskId < 0) {
+                return res.status(400).json(JSON_NOT_FOUND);
+            }
+
+            conversation.tasks[taskId].completed = true;
+
+            await conversation.save();
+
+            res.status(200).json(JSON_OK);
+        }
+        catch (error) {
+            return res.status(500).json(JSON_SERVER_ERROR);
+        }
+    }
+);
+
+conversations.get("/:id/tasks", 
+    Middlewares.authUser, 
+    Middlewares.requireId,
+    async(req , res) => {
+        const id = req.params.id + "";
+        // @ts-ignore
+        const userId = req.user.id + "";
+
+        try {
+            const [conversation, belongs] = await inConversation(id, userId);
+
+            if(!belongs) {
+                res.status(401).json({
+                    errors: ["You don't belong in this conversation."]
+                });
+                return;
+            }
+            
+            if(!conversation.isGroup) {
+                res.status(200).json([]);
+                return;
+            }
+
+            const result = conversation.tasks.map(Jsoner.task);
+            res.status(200).json(result);
+        }   
+        catch(_) {
+            res.status(500).json(JSON_SERVER_ERROR);
+        }
+    }
+);
+
+conversations.post("/:id/tasks", 
+    Middlewares.authUser, 
+    Middlewares.requireId,
+    async(req , res) => {
+        const id = req.params.id + "";
+        // @ts-ignore
+        const userId = req.user.id + "";
+        
+        const { title } = req.body;
+
+        try{
+            if(typeof title !== "string" || !title.trim()){
+                return res.status(400).json({
+                    errors: ["Invalid task content."]
+                })
+            }
+
+            const [conversation, belongs] = await inConversation(id, userId);
+
+            if(!belongs) {
+                res.status(401).json({
+                    errors: ["You don't belong in this conversation."]
+                });
+                return;
+            }
+            
+            if(!conversation.isGroup) {
+                res.status(400).json({
+                    errors: ["Tasks can only be assigned within groups."]
+                });
+                return;
+            }
+
+            conversation.tasks.push({
+                title,
+                completed: false    
+            });
+
+            await conversation.save();
+
+            res.status(200).json(JSON_OK);
+        }
+        catch (_) {
+            return res.status(500).json(JSON_SERVER_ERROR);
+        }
+    }
+);
 
 conversations.patch("/:id/add-participant", 
     Middlewares.authUser, 

@@ -11,6 +11,7 @@ export default function Store() {
 
     const [items, setItems] = useState([]);
     const [points, setPoints] = useState(0);
+    const [message, setMessage] = useState(null);
     const didFetch = useRef(false);
 
     useEffect(() => {
@@ -33,7 +34,7 @@ export default function Store() {
     }, []);
 
     const showErrors = (error) => {
-        alert(error.response.data.errors);
+        setMessage(error.response.data.errors);
     }
 
     const buyItem = async (id) => {
@@ -61,6 +62,11 @@ export default function Store() {
     });
 
     return (<>
+        { message && <Components.MessageBox
+            title={message.title}
+            content={message.content}
+            onConfirm={() => setMessage(null)}
+        />}
         <div id="header">
             <Components.ButtonIcon icon="arrow_left_alt" onClick={() => navigate("/menu")} />
             <Components.Flexed className="header-title">
