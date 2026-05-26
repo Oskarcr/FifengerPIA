@@ -15,6 +15,17 @@ const ConversationSchema = new Schema({
         required: true,
         default: () => crypto.randomBytes(16).toString("hex")
     },
+    tasks: [{
+        title: {
+            type: String,
+            required: true
+        },
+        completed: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+    }],
     participants: [{
         type: Schema.Types.ObjectId,
         ref: "User"

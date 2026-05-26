@@ -19,13 +19,17 @@ users.get("/search", Middlewares.authUser, async (req, res) => {
         const query = req.query;
         delete query.password;
         if (!query || Object.keys(query).length === 0) {
-            return res.status(400).send("User not found");
+            res.status(400).json(JSON_NOT_FOUND);
+            return;
         }
         const user = await User.findOne({
             ...query
         });
 
-        if(!user) return res.status(400).send("User not found");
+        if(!user) {
+            res.status(400).json(JSON_NOT_FOUND);
+            return;
+        }
 
         res.status(200).json(Jsoner.user(user));
     } 
@@ -134,55 +138,57 @@ users.get("/:id",
     }
 );
 
-users.patch("/me", Middlewares.authUser, async (req,res) => {
-    const { email: currentEmail, username: currentUsername, id: id } = req.user;
+users.patch("/me", 
+    Middlewares.authUser, 
+    async (req,res) => {
+        // @ts-ignore
+        const userId = req.user.id + "";
 
-    const body = validator.parseBody(req.body);
+        const body = validator.parseBody(req.body);
 
-    const { username, email } = body;
-
-    const empties = validator.empties(body, "username", "email")
-    
-    if(empties.length > 0){
-        res.status(400).json({
-            empties
-        });
-        return;
-    }
-
-    const errors = validator.validate(body)
-
-    if(errors.length > 0){
-        res.status(400).json({
-            errors
-        });
-        return;
-    }
-
-    try{
-        const user = await User.findByIdAndUpdate( id , {
-            username: username,
-            email: email
-        },
-        {returnDocument: "after"}
-    );
-
-        if(!user){
+        const empties = validator.empties(body, "username", "email")
+        
+        if(empties.length > 0){
             res.status(400).json({
-                message: "User not found."
+                empties
             });
             return;
         }
-        console.log(currentEmail + " " + currentUsername);
 
-        return res.status(200).json(Jsoner.user(user));
-    }
-    catch(error){
-        console.log(error);
+        const errors = validator.validate(body)
 
-        return res.status(500).json(JSON_SERVER_ERROR);
+        if(errors.length > 0){
+            res.status(400).json({
+                errors
+            });
+            return;
+        }
+        
+        const { username, email } = body;
+
+        try{
+            const user = await User.findByIdAndUpdate(userId, {
+                username: username,
+                email: email
+            },
+            {returnDocument: "after"}
+        );
+
+            if(!user){
+                res.status(400).json({
+                    message: "User not found."
+                });
+                return;
+            }
+
+            res.status(200).json(Jsoner.user(user));
+        }
+        catch(error){
+            console.log(error);
+            res.status(500).json(JSON_SERVER_ERROR);
+        }
     }
-});
+);
 
 users.post("/logout", Middlewares.authUser, (req, res) => {
     console.log("Galleta cerrada.");
