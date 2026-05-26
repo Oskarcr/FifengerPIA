@@ -133,7 +133,11 @@ export default function Chat() {
         try {
             formRef.current.reset();
             const response = await api.post("/messages", data);
-            if(isTemp) navigate("/chat/" + response.data.conversationId);
+            if(isTemp) {
+                setTimeout(() => {  
+                    navigate("/chats/" + response.data.conversationId);
+                }, 500);
+            }
         }
         catch(error) {
             showErrors(error);
@@ -300,16 +304,25 @@ export default function Chat() {
             <Components.Flexed className="header-title">
                 {label}
             </Components.Flexed>
-            <Components.ButtonIcon icon="forward_to_inbox" onClick={onSendMail}/>
-            <Components.ButtonIcon icon={cryptoIcon}  onClick={onSwitchEncryption}/>
-            {(!isGroup && isGroup !== null) && <Components.ButtonIcon 
+            {(!isTemp) && <>
+                <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
+                <Components.ButtonIcon icon="forward_to_inbox" onClick={onSendMail}/>
+            </>}
+            
+            {(!isGroup && isGroup !== null && !isTemp) && <Components.ButtonIcon 
                 icon="call"
                 onClick={() => navigate("/call/" + conversationId)}
             />}
-            <Components.ButtonIcon icon="group_add" onClick={onGroupAdd}/>
             
+            {(!isTemp) && 
+                <Components.ButtonIcon icon={cryptoIcon}  onClick={onSwitchEncryption}/>}
+
             {/* 📋 BOTÓN PARA IR AL PANEL DE TAREAS (REQUISITO 4) */}
-            <Components.ButtonIcon icon="assignment" onClick={() => navigate(`/chats/${conversationId}/tasks`)}/>
+            
+             {(!isGroup && isGroup !== null && !isTemp) && 
+             <Components.ButtonIcon icon="assignment" onClick={() => navigate(`/chats/${conversationId}/tasks`)}/>
+             }
+            
         </div>
         
         <div id="root-content" style={{

@@ -264,9 +264,6 @@ conversations.patch("/:id/add-participant",
         });
 
         try {
-
-            console.log(emailNormalized);
-            console.log(id);
             const userToAdd = await User.findOne({
                 email: emailNormalized
             });
@@ -289,9 +286,7 @@ conversations.patch("/:id/add-participant",
             }
 
             const alreadyExists = conversation.participants.some(pId => pId.equals(userToAdd._id));
-            console.log(alreadyExists);
-            console.log(conversation.participants);
-            console.log(userToAdd._id.toString());
+
             if(alreadyExists){
                 return res.status(400).json({
                     message: "The user is already a member of this group."

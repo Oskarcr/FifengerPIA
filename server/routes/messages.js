@@ -215,21 +215,18 @@ messages.post("/",
             else {
                 const participants = [userId, destinatorId];
 
-                conversation = await Conversation.findOneAndUpdate({
+                conversation = await Conversation.findOne({
                     participants: {
                         $all: participants,
                         $size: 2
                     }
-                },
-                {
-                    $setOnInsert: {
-                        participants: participants
-                    }
-                },
-                {
-                    upsert: true,
-                    returnDocument: "after"
                 });
+
+                if(!conversation) {
+                    conversation = await Conversation.create({
+                        participants
+                    });
+                }
             }
 
             if (!conversation) {
@@ -261,16 +258,19 @@ messages.post("/",
             await message.populate("user");
 
             const msgJson = Jsoner.message(message);
+            msgJson.conversationId = conversation._id;
+
+            console.log(msgJson);
             msgJson.content = content;
 
             io.to(conversationId).emit("message_create", msgJson);
-
-            res.status(200).json(msgJson);
 
             autoGivePoints(userId, {
                 ...msgJson,
                 isGroup: conversation.isGroup
             });
+
+            res.status(200).json(msgJson);
         }
         catch(_) {
             console.log(_);

@@ -33,6 +33,7 @@ class Jsoner {
     static message(a) {
         return {
             content: a.content,
+            conversationId: a.conversation,
             attachmentUrl: a.attachmentUrl,
             isEncrypted: a.isEncrypted,
             user: Jsoner.user(a.user)
