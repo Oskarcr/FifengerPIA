@@ -17,8 +17,7 @@ export default function authUser(req, res, next){
 
         next();
     }
-    catch(error) {
-        console.log(error);
+    catch(_) {
         return res.status(401).send("Token error.");
     }
 }
