@@ -316,10 +316,8 @@ export default function Chat() {
             
             {(!isTemp) && 
                 <Components.ButtonIcon icon={cryptoIcon}  onClick={onSwitchEncryption}/>}
-
-            {/* 📋 BOTÓN PARA IR AL PANEL DE TAREAS (REQUISITO 4) */}
             
-             {(!isGroup && isGroup !== null && !isTemp) && 
+             {(isGroup && isGroup !== null && !isTemp) && 
              <Components.ButtonIcon icon="assignment" onClick={() => navigate(`/chats/${conversationId}/tasks`)}/>
              }
             
